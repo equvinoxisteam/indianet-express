@@ -73,6 +73,84 @@ function SectionMadals({
         setItems2SectionThree(sectionThree.items2)
     }, [sectionOne, sectionFour, sectionTwo, sectionThree])
 
+    useEffect(() => {
+        if (!activeModal.active) return
+        const key = activeModal.sectionKey || 'sectionone'
+        setSectionName(key)
+        if (key === 'sectionone') {
+            setSectionOne({
+                for: 'sectionone',
+                title: sectionOneDetails.title || '',
+                subTitle: sectionOneDetails.subTitle || '',
+                items: sectionOneDetails.items || [],
+            })
+        } else if (key === 'sectionfour') {
+            setSectionFour({
+                for: 'sectionfour',
+                title: sectionFourDetails.title || '',
+                subTitle: sectionFourDetails.subTitle || '',
+                items: sectionFourDetails.items || [],
+            })
+        } else if (key === 'sectiontwo') {
+            setSectionTwo({
+                for: 'sectiontwo',
+                title: sectionTwoDetails.title || '',
+                subTitle: sectionTwoDetails.subTitle || '',
+                items: sectionTwoDetails.items || [],
+                items2: sectionTwoDetails.items2 || [],
+            })
+        } else if (key === 'sectionthree') {
+            setSectionThree({
+                for: 'sectionthree',
+                title: sectionThreeDetails.title || '',
+                subTitle: sectionThreeDetails.subTitle || '',
+                items: sectionThreeDetails.items || [],
+                items2: sectionThreeDetails.items2 || [],
+            })
+        }
+        setSearchCategory([])
+        setSearchProduct([])
+        setSearchProductR2([])
+    }, [activeModal.active, activeModal.sectionKey])
+
+    function loadSectionIntoForm(val) {
+        setSectionName(val)
+        if (val === 'sectionone') {
+            setSectionOne({
+                for: 'sectionone',
+                title: sectionOneDetails.title || '',
+                subTitle: sectionOneDetails.subTitle || '',
+                items: sectionOneDetails.items || [],
+            })
+        } else if (val === 'sectionfour') {
+            setSectionFour({
+                for: 'sectionfour',
+                title: sectionFourDetails.title || '',
+                subTitle: sectionFourDetails.subTitle || '',
+                items: sectionFourDetails.items || [],
+            })
+        } else if (val === 'sectiontwo') {
+            setSectionTwo({
+                for: 'sectiontwo',
+                title: sectionTwoDetails.title || '',
+                subTitle: sectionTwoDetails.subTitle || '',
+                items: sectionTwoDetails.items || [],
+                items2: sectionTwoDetails.items2 || [],
+            })
+        } else if (val === 'sectionthree') {
+            setSectionThree({
+                for: 'sectionthree',
+                title: sectionThreeDetails.title || '',
+                subTitle: sectionThreeDetails.subTitle || '',
+                items: sectionThreeDetails.items || [],
+                items2: sectionThreeDetails.items2 || [],
+            })
+        }
+        setSearchCategory([])
+        setSearchProduct([])
+        setSearchProductR2([])
+    }
+
     let modalRef = useRef()
 
     useEffect(() => {
@@ -109,7 +187,12 @@ function SectionMadals({
     function formSectionOne(e) {
         e.preventDefault()
         adminAxios((server) => {
-            server.post('/admin/addOneRowSection', sectionOne).then((done) => {
+            server.put('/admin/saveOneRowSection', {
+                for: 'sectionone',
+                title: sectionOne.title,
+                subTitle: sectionOne.subTitle,
+                items: sectionOne.items,
+            }).then((done) => {
                 if (done.data.login) {
                     logOut()
                 } else {
@@ -133,7 +216,12 @@ function SectionMadals({
     function formSectionFour(e) {
         e.preventDefault()
         adminAxios((server) => {
-            server.post('/admin/addOneRowSection', sectionFour).then((done) => {
+            server.put('/admin/saveOneRowSection', {
+                for: 'sectionfour',
+                title: sectionFour.title,
+                subTitle: sectionFour.subTitle,
+                items: sectionFour.items,
+            }).then((done) => {
                 if (done.data.login) {
                     logOut()
                 } else {
@@ -157,7 +245,13 @@ function SectionMadals({
     function formSectionTwo(e) {
         e.preventDefault()
         adminAxios((server) => {
-            server.post('/admin/addTwoRowSection', sectionTwo).then((done) => {
+            server.put('/admin/saveTwoRowSection', {
+                for: 'sectiontwo',
+                title: sectionTwo.title,
+                subTitle: sectionTwo.subTitle,
+                items: sectionTwo.items,
+                items2: sectionTwo.items2,
+            }).then((done) => {
                 if (done.data.login) {
                     logOut()
                 } else {
@@ -181,7 +275,13 @@ function SectionMadals({
     function formSectionThree(e) {
         e.preventDefault()
         adminAxios((server) => {
-            server.post('/admin/addTwoRowSection', sectionThree).then((done) => {
+            server.put('/admin/saveTwoRowSection', {
+                for: 'sectionthree',
+                title: sectionThree.title,
+                subTitle: sectionThree.subTitle,
+                items: sectionThree.items,
+                items2: sectionThree.items2,
+            }).then((done) => {
                 if (done.data.login) {
                     logOut()
                 } else {
@@ -246,7 +346,7 @@ function SectionMadals({
                                     <div className="col-12">
                                         <label>Select Section</label>
                                         <select value={sectionName} onChange={(e) => {
-                                            setSectionName(e.target.value)
+                                            loadSectionIntoForm(e.target.value)
                                         }}>
                                             <option value="sectionone">Section One</option>
                                             <option value="sectiontwo">Section Two</option>
@@ -386,7 +486,7 @@ function SectionMadals({
                                     <div className="col-12">
                                         <label>Select Section</label>
                                         <select value={sectionName} onChange={(e) => {
-                                            setSectionName(e.target.value)
+                                            loadSectionIntoForm(e.target.value)
                                         }}>
                                             <option value="sectionone">Section One</option>
                                             <option value="sectiontwo">Section Two</option>
@@ -625,7 +725,7 @@ function SectionMadals({
                                     <div className="col-12">
                                         <label>Select Section</label>
                                         <select value={sectionName} onChange={(e) => {
-                                            setSectionName(e.target.value)
+                                            loadSectionIntoForm(e.target.value)
                                         }}>
                                             <option value="sectionone">Section One</option>
                                             <option value="sectiontwo">Section Two</option>
@@ -864,7 +964,7 @@ function SectionMadals({
                                     <div className="col-12">
                                         <label>Select Section</label>
                                         <select value={sectionName} onChange={(e) => {
-                                            setSectionName(e.target.value)
+                                            loadSectionIntoForm(e.target.value)
                                         }}>
                                             <option value="sectionone">Section One</option>
                                             <option value="sectiontwo">Section Two</option>

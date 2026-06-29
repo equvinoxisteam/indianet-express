@@ -142,6 +142,7 @@ export default {
                     $unwind: "$sub"
                 }, {
                     $project: {
+                        _id: '$_id',
                         uni_id: "$sub.uni_id",
                         slug: "$sub.slug",
                         name: "$sub.name",

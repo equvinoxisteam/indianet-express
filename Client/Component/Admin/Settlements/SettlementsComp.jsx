@@ -40,6 +40,37 @@ function SettlementsComp() {
                 <p className="adminPageSubtitle">15% + ₹30 per item collected from buyers — vendor payout after 30 days</p>
             </div>
 
+            <div className="bg-white border rounded p-4 mb-4">
+                <h5 className="font-bold mb-3">How Indianet Express pricing works</h5>
+                <div className="row g-3">
+                    <div className="col-md-6">
+                        <p className="mb-2"><strong>What the customer pays</strong></p>
+                        <ul className="small text-muted mb-0">
+                            <li>Product price (vendor&apos;s listed price)</li>
+                            <li>+ Platform fee: <strong>15%</strong> of product + <strong>₹30</strong> per line item</li>
+                            <li>+ GST <strong>18%</strong> on (product + platform fee)</li>
+                            <li>+ Shiprocket shipping (by pincode)</li>
+                        </ul>
+                    </div>
+                    <div className="col-md-6">
+                        <p className="mb-2"><strong>Example — ₹1,000 product (1 qty)</strong></p>
+                        <table className="table table-sm small mb-2">
+                            <tbody>
+                                <tr><td>Product</td><td className="text-end">₹1,000</td></tr>
+                                <tr><td>Platform fee (15% + ₹30)</td><td className="text-end">₹180</td></tr>
+                                <tr><td>GST 18%</td><td className="text-end">₹212</td></tr>
+                                <tr className="table-light"><td><strong>Customer total</strong> <span className="text-muted">(excl. shipping)</span></td><td className="text-end"><strong>≈ ₹1,392</strong></td></tr>
+                            </tbody>
+                        </table>
+                        <p className="small text-muted mb-0">
+                            <strong>Your revenue:</strong> ₹180 platform fee per item.
+                            <br />
+                            <strong>Vendor gets:</strong> full ₹1,000 listed price, paid out after <strong>30 days</strong> (settlements below).
+                        </p>
+                    </div>
+                </div>
+            </div>
+
             <div className="row g-3 mb-4">
                 {[
                     { label: 'Platform revenue (all time)', value: data?.platformRevenueTotal },

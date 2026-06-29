@@ -1,6 +1,7 @@
 import db from '../Config/Connection.js'
 import collections from '../Config/Collection.js'
 import { DeleteOneFile } from './deleteFile.js'
+import { ObjectId } from 'mongodb'
 
 export default {
     addOneRowSection: (details) => {
@@ -32,6 +33,33 @@ export default {
                 }).catch((err) => {
                     reject(err)
                 })
+            }
+        })
+    },
+    saveOneRowSection: (details) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const items = (details.items || [])
+                    .filter((i) => i && i._id)
+                    .map((i) => ({ _id: ObjectId(String(i._id)) }))
+                const payload = {
+                    for: details.for,
+                    title: details.title || '',
+                    subTitle: details.subTitle || '',
+                    items,
+                }
+                const existing = await db.get().collection(collections.LAYOUT).findOne({ for: details.for })
+                if (!existing) {
+                    await db.get().collection(collections.LAYOUT).insertOne(payload)
+                } else {
+                    await db.get().collection(collections.LAYOUT).updateOne(
+                        { for: details.for },
+                        { $set: payload }
+                    )
+                }
+                resolve()
+            } catch (err) {
+                reject(err)
             }
         })
     },
@@ -324,6 +352,34 @@ export default {
             }
         })
     },
+    saveTwoRowSection: (details) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const mapItems = (list) => (list || [])
+                    .filter((i) => i && i._id)
+                    .map((i) => ({ _id: ObjectId(String(i._id)) }))
+                const payload = {
+                    for: details.for,
+                    title: details.title || '',
+                    subTitle: details.subTitle || '',
+                    items: mapItems(details.items),
+                    items2: mapItems(details.items2),
+                }
+                const existing = await db.get().collection(collections.LAYOUT).findOne({ for: details.for })
+                if (!existing) {
+                    await db.get().collection(collections.LAYOUT).insertOne(payload)
+                } else {
+                    await db.get().collection(collections.LAYOUT).updateOne(
+                        { for: details.for },
+                        { $set: payload }
+                    )
+                }
+                resolve()
+            } catch (err) {
+                reject(err)
+            }
+        })
+    },
     addSlider: (slider, details) => {
         return new Promise((resolve, reject) => {
             db.get().collection(collections.LAYOUT).findOne({
@@ -380,6 +436,57 @@ export default {
             }).catch((err) => {
                 reject(err)
             })
+        })
+    },
+    updateSliderItem: (sliderFor, uni_id, updates) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const layout = await db.get().collection(collections.LAYOUT).findOne({ for: sliderFor })
+                if (!layout) return reject(new Error('not_found'))
+                const items = (layout.items || []).map((item) => {
+                    if (String(item.uni_id) === String(uni_id)) {
+                        return { ...item, ...updates }
+                    }
+                    return item
+                })
+                await db.get().collection(collections.LAYOUT).updateOne(
+                    { for: sliderFor },
+                    { $set: { items } }
+                )
+                resolve()
+            } catch (err) {
+                reject(err)
+            }
+        })
+    },
+    updateBanner: (file, link) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const banner = await db.get().collection(collections.LAYOUT).findOne({ for: 'banner' })
+                if (!banner) {
+                    if (!file) return reject(new Error('banner_image_required'))
+                    await db.get().collection(collections.LAYOUT).insertOne({
+                        for: 'banner',
+                        file,
+                        link: link || '',
+                    })
+                    return resolve()
+                }
+                const update = { link: link || '' }
+                if (file) {
+                    update.file = file
+                    if (banner.file?.filename) {
+                        DeleteOneFile(`./uploads/banner/${banner.file.filename}`, () => {})
+                    }
+                }
+                await db.get().collection(collections.LAYOUT).updateOne(
+                    { for: 'banner' },
+                    { $set: update }
+                )
+                resolve()
+            } catch (err) {
+                reject(err)
+            }
         })
     },
     addBanner: (file, link) => {

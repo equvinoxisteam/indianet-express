@@ -154,7 +154,8 @@ function LayoutsComp({ setLoaded, loaded }) {
                         ...activeExtraModal,
                         btn: true,
                         active: true,
-                        for: 'slider'
+                        for: 'slider',
+                        editItem: null
                       })
                     }}>
                     Add Slider
@@ -167,7 +168,8 @@ function LayoutsComp({ setLoaded, loaded }) {
                         ...activeExtraModal,
                         btn: true,
                         active: true,
-                        for: 'slidertwo'
+                        for: 'slidertwo',
+                        editItem: null
                       })
                     }}>Add Slider 2</button>
                 </div>
@@ -178,7 +180,8 @@ function LayoutsComp({ setLoaded, loaded }) {
                         ...activeExtraModal,
                         btn: true,
                         active: true,
-                        for: 'banner'
+                        for: 'banner',
+                        editItem: null
                       })
                     }}>Add Banner</button>
                 </div>
@@ -189,7 +192,8 @@ function LayoutsComp({ setLoaded, loaded }) {
                       setActiveSecModal({
                         ...activeSecModal,
                         btn: true,
-                        active: true
+                        active: true,
+                        sectionKey: 'sectionone'
                       })
                     }}>
                     Add Section Items
@@ -263,7 +267,8 @@ function LayoutsComp({ setLoaded, loaded }) {
                         ...activeExtraModal,
                         btn: true,
                         active: true,
-                        for: 'slider'
+                        for: 'slider',
+                        editItem: null
                       })
                     }}>
                       <i className="fa-solid fa-plus me-1"></i> Add/Edit Slider Item
@@ -367,7 +372,8 @@ function LayoutsComp({ setLoaded, loaded }) {
                         ...activeExtraModal,
                         btn: true,
                         active: true,
-                        for: 'slidertwo'
+                        for: 'slidertwo',
+                        editItem: null
                       })
                     }}>
                       <i className="fa-solid fa-plus me-1"></i> Add/Edit Slider Item
@@ -460,7 +466,8 @@ function LayoutsComp({ setLoaded, loaded }) {
                         ...activeExtraModal,
                         btn: true,
                         active: true,
-                        for: 'banner'
+                        for: 'banner',
+                        editItem: null
                       })
                     }}>
                       <i className="fa-solid fa-pen me-1"></i> Edit Banner
@@ -544,7 +551,8 @@ function LayoutsComp({ setLoaded, loaded }) {
                       setActiveSecModal({
                         ...activeSecModal,
                         btn: true,
-                        active: true
+                        active: true,
+                        sectionKey: 'sectionone'
                       })
                     }}>
                       <i className="fa-solid fa-pen-to-square me-1"></i> Edit Section
@@ -632,7 +640,8 @@ function LayoutsComp({ setLoaded, loaded }) {
                       setActiveSecModal({
                         ...activeSecModal,
                         btn: true,
-                        active: true
+                        active: true,
+                        sectionKey: 'sectiontwo'
                       })
                     }}>
                       <i className="fa-solid fa-pen-to-square me-1"></i> Edit Section
@@ -780,7 +789,8 @@ function LayoutsComp({ setLoaded, loaded }) {
                       setActiveSecModal({
                         ...activeSecModal,
                         btn: true,
-                        active: true
+                        active: true,
+                        sectionKey: 'sectionthree'
                       })
                     }}>
                       <i className="fa-solid fa-pen-to-square me-1"></i> Edit Section
@@ -928,7 +938,8 @@ function LayoutsComp({ setLoaded, loaded }) {
                       setActiveSecModal({
                         ...activeSecModal,
                         btn: true,
-                        active: true
+                        active: true,
+                        sectionKey: 'sectionfour'
                       })
                     }}>
                       <i className="fa-solid fa-pen-to-square me-1"></i> Edit Section

@@ -402,6 +402,7 @@ export default {
             }, {
                 $set: {
                     name: details.name,
+                    slug: details.slug,
                     file: details.file
                 }
             }).then((done) => {

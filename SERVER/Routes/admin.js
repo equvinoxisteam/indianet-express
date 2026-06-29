@@ -621,7 +621,8 @@ router.put('/editCategory', CheckAdmin, uploader.categories.single('image'), (re
 
     var details = {
         name: req.body.name,
-        cateId: req.body.cateId
+        cateId: req.body.cateId,
+        slug: slugify(req.body.name),
     }
 
     if (req.file !== undefined) {
@@ -659,6 +660,22 @@ router.post('/addTwoRowSection', CheckAdmin, (req, res) => {
     layout.addTwoRowSection(req.body).then((done) => {
         res.status(200).json('done')
     }).catch((err) => {
+        res.status(500).json('err')
+    })
+})
+
+router.put('/saveOneRowSection', CheckAdmin, (req, res) => {
+    layout.saveOneRowSection(req.body).then(() => {
+        res.status(200).json('done')
+    }).catch(() => {
+        res.status(500).json('err')
+    })
+})
+
+router.put('/saveTwoRowSection', CheckAdmin, (req, res) => {
+    layout.saveTwoRowSection(req.body).then(() => {
+        res.status(200).json('done')
+    }).catch(() => {
         res.status(500).json('err')
     })
 })
@@ -723,6 +740,38 @@ router.post('/addSlider', CheckAdmin, uploader.extra.single('image'), (req, res)
         res.status(500).json('err')
     })
 
+})
+
+router.put('/updateSlider', CheckAdmin, uploader.extra.single('image'), (req, res) => {
+    try {
+        const parsed = JSON.parse(req.body.details || '{}')
+        const updates = {
+            title: parsed.title,
+            content: parsed.content,
+            subContent: parsed.subContent,
+            btn: parsed.btn,
+            btnLink: parsed.btnLink,
+            link: parsed.link,
+        }
+        if (req.file) {
+            updates.file = req.file
+        }
+        layout.updateSliderItem(req.body.for, req.body.uni_id, updates).then(() => {
+            res.status(200).json('done')
+        }).catch(() => {
+            res.status(500).json('err')
+        })
+    } catch {
+        res.status(400).json('err')
+    }
+})
+
+router.put('/updateBanner', CheckAdmin, uploader.banner.single('image'), (req, res) => {
+    layout.updateBanner(req.file || null, req.body.link || '').then(() => {
+        res.status(200).json('done')
+    }).catch(() => {
+        res.status(500).json('err')
+    })
 })
 
 router.put('/removeSlider', CheckAdmin, (req, res) => {
