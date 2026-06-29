@@ -46,8 +46,9 @@ SHIPROCKET_PASS=<shiprocket password>
 AWS_ACCESS_KEY_ID=<aws key>
 AWS_SECRET_ACCESS_KEY=<aws secret>
 AWS_REGION=eu-north-1
-AWS_S3_BUCKET=indianet-express-equvinoxis
-S3_PUBLIC_URL=https://indianet-express-equvinoxis.s3.eu-north-1.amazonaws.com
+AWS_S3_BUCKET=indianet-equvinoxis
+S3_PUBLIC_URL=https://indianet-equvinoxis.s3.eu-north-1.amazonaws.com
+S3_KEY_PREFIX=indianet-express-equvinoxis
 ```
 
 Optional WhatsApp (Twilio):
@@ -64,14 +65,15 @@ Railway → Web service → Variables:
 
 ```
 ServerUrl=https://api.indianetexpress.equvinoxis.com/api
-ServerId=https://indianet-express-equvinoxis.s3.eu-north-1.amazonaws.com
+ServerId=https://indianet-equvinoxis.s3.eu-north-1.amazonaws.com/indianet-express-equvinoxis
 ```
 
 ## AWS S3 bucket
 
-1. Create bucket **`indianet-express-equvinoxis`** in `eu-north-1`
-2. Enable public read for `/product/*` paths (or use bucket policy from main Indianet setup)
-3. Set `AWS_*` and `S3_PUBLIC_URL` on the API service
+1. Use existing bucket **`indianet-equvinoxis`** in `eu-north-1`
+2. Optional folder prefix: `S3_KEY_PREFIX=indianet-express-equvinoxis`
+3. Enable public read on objects (bucket policy)
+4. Set `AWS_*`, `S3_PUBLIC_URL`, `S3_KEY_PREFIX` on API; `ServerId` on Client must match public URL + prefix
 
 ## MongoDB
 

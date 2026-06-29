@@ -65,7 +65,7 @@ function OrdersComp({ loaded, setLoaded }) {
                         <div className='AdminContainer pb-3'>
                             <div className="adminPageHeader mb-3 pt-3">
                                 <h1>E-commerce orders</h1>
-                                <p>All buyer orders — COD & Razorpay — update status to send email & WhatsApp notifications</p>
+                                <p>All orders from every vendor and platform — COD &amp; Razorpay</p>
                             </div>
 
                             <div className="BtnsSections text-center pt-3">
@@ -84,6 +84,7 @@ function OrdersComp({ loaded, setLoaded }) {
                                     <thead>
                                         <tr>
                                             <th>Product</th>
+                                            <th>Vendor</th>
                                             <th>Date</th>
                                             <th>Customer</th>
                                             <th>Price</th>
@@ -100,6 +101,7 @@ function OrdersComp({ loaded, setLoaded }) {
                                                 return (
                                                     <tr key={key}>
                                                         <td className="small">{obj.proName || '—'}</td>
+                                                        <td className="small">{obj.vendorName || '—'}</td>
                                                         <td>{obj.date}</td>
                                                         <td>{obj.customer}</td>
                                                         <td>₹{obj.price}</td>

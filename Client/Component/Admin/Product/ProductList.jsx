@@ -64,7 +64,7 @@ function ProductList({ loaded, setLoaded }) {
                     <div className='AdminContainer'>
                         <div className='pt-3 ProductListAdmin'>
                             <div className='TitleGrid d-flex justify-content-between align-items-center mb-4'>
-                                <h5 className='UserBlackMain font-bold mb-0'>PRODUCTS MANAGEMENT</h5>
+                                <h5 className='UserBlackMain font-bold mb-0'>PRODUCTS — ALL VENDORS &amp; PLATFORM</h5>
                                 <button className='btn btn-primary rounded-pill px-4' onClick={() => navigate.push('/admin/products/add')}>
                                     <i className="fa-solid fa-plus me-2"></i> Add Product
                                 </button>

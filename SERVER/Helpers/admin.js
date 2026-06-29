@@ -3,6 +3,72 @@ import collections from '../Config/Collection.js'
 import { ObjectId } from 'mongodb'
 import bcrypt from 'bcrypt'
 
+async function resolveVendorDocById(vendorId) {
+    if (!vendorId || !ObjectId.isValid(String(vendorId))) return null
+    return db.get().collection(collections.VENDORS).findOne({ _id: ObjectId(String(vendorId)) })
+}
+
+async function resolveVendorDocForProduct(product) {
+    if (product?.vendorId) {
+        const byVendorId = await resolveVendorDocById(product.vendorId)
+        if (byVendorId) return byVendorId
+    }
+    if (product?.vendor && product.vendor !== true && product.vendor !== false) {
+        return resolveVendorDocById(product.vendor)
+    }
+    return null
+}
+
+function vendorDisplayFields(vendor) {
+    if (!vendor) {
+        return {
+            vendorName: 'Platform (Admin)',
+            vendorEmail: 'N/A',
+            vendorPhone: 'N/A',
+            vendorWebsite: '',
+            vendorLogo: '',
+            vendorBackground: '',
+            vendorDescription: '',
+        }
+    }
+    return {
+        vendorName: vendor.companyName || vendor.adharName || vendor.name || 'Vendor',
+        vendorEmail: vendor.email || 'N/A',
+        vendorPhone: vendor.number || vendor.phone || 'N/A',
+        vendorWebsite: vendor.website || '',
+        vendorLogo: vendor.logo || '',
+        vendorBackground: vendor.backgroundImage || '',
+        vendorDescription: vendor.description || '',
+    }
+}
+
+async function enrichProductWithVendor(product) {
+    const vendor = await resolveVendorDocForProduct(product)
+    return { ...product, ...vendorDisplayFields(vendor) }
+}
+
+async function enrichProductsWithVendor(products) {
+    return Promise.all((products || []).map(enrichProductWithVendor))
+}
+
+async function enrichOrdersWithVendor(orders) {
+    const vendorIds = [...new Set((orders || []).map((o) => String(o.vendorId || '')).filter(Boolean))]
+    const vendorMap = {}
+    if (vendorIds.length) {
+        const objectIds = vendorIds.filter((id) => ObjectId.isValid(id)).map((id) => ObjectId(id))
+        if (objectIds.length) {
+            const vendors = await db.get().collection(collections.VENDORS).find({ _id: { $in: objectIds } }).toArray()
+            for (const v of vendors) {
+                vendorMap[String(v._id)] = v.companyName || v.adharName || v.name || 'Vendor'
+            }
+        }
+    }
+    return (orders || []).map((o) => ({
+        ...o,
+        vendorName: o.vendorId ? (vendorMap[String(o.vendorId)] || 'Vendor') : 'Platform',
+    }))
+}
+
 export default {
     getAllOrders: ({ search, skip }, limit) => {
         return new Promise(async (resolve, reject) => {
@@ -22,12 +88,14 @@ export default {
                         payType: '$order.details.payType',
                         OrderId: '$order.OrderId',
                         OrderStatus: '$order.OrderStatus',
-                        price: '$order.price'
+                        price: '$order.price',
+                        proName: '$order.proName',
+                        vendorId: '$order.vendorId',
                     }
                 }, {
                     $match: {
                         customer: {
-                            $regex: search, $options: 'i'
+                            $regex: search || '', $options: 'i'
                         }
                     }
                 }, {
@@ -44,7 +112,8 @@ export default {
             })
 
             if (orders) {
-                resolve(orders)
+                const enriched = await enrichOrdersWithVendor(orders)
+                resolve(enriched)
             } else {
                 reject()
             }
@@ -62,7 +131,7 @@ export default {
                 }, {
                     $match: {
                         customer: {
-                            $regex: search, $options: 'i'
+                            $regex: search || '', $options: 'i'
                         }
                     }
                 }, {
@@ -432,54 +501,10 @@ export default {
     },
     getAdminProducts: (skip, limit) => {
         return new Promise(async (resolve, reject) => {
-            // Get all products (both admin and vendor)
             let products = await db.get().collection(collections.PRODUCTS).find({}).sort({ _id: -1 }).skip(skip).limit(limit).toArray().catch((err) => {
                 reject(err)
             })
-            
-            // Enrich products with vendor details if they belong to a vendor
-            const enrichedProducts = await Promise.all(products.map(async (product) => {
-                if (product.vendor && product.vendor !== false && ObjectId.isValid(product.vendor)) {
-                    try {
-                        const vendor = await db.get().collection(collections.VENDORS).findOne({ _id: new ObjectId(product.vendor) })
-                        return {
-                            ...product,
-                            vendorName: vendor ? vendor.name : 'Unknown Vendor',
-                            vendorEmail: vendor ? vendor.email : 'N/A',
-                            vendorPhone: vendor ? vendor.phone : 'N/A',
-                            vendorWebsite: vendor?.website || '',
-                            vendorLogo: vendor?.logo || '',
-                            vendorBackground: vendor?.backgroundImage || '',
-                            vendorDescription: vendor?.description || ''
-                        }
-                    } catch (error) {
-                        console.error('Error fetching vendor:', error)
-                        return {
-                            ...product,
-                            vendorName: 'Unknown Vendor',
-                            vendorEmail: 'N/A',
-                            vendorPhone: 'N/A',
-                            vendorWebsite: '',
-                            vendorLogo: '',
-                            vendorBackground: '',
-                            vendorDescription: ''
-                        }
-                    }
-                } else {
-                    return {
-                        ...product,
-                        vendorName: 'Admin',
-                        vendorEmail: 'N/A',
-                        vendorPhone: 'N/A',
-                        vendorWebsite: '',
-                        vendorLogo: '',
-                        vendorBackground: '',
-                        vendorDescription: ''
-                    }
-                }
-            }))
-            
-            resolve(enrichedProducts)
+            resolve(await enrichProductsWithVendor(products))
         })
     },
     getProductCount: () => {
@@ -493,25 +518,26 @@ export default {
     },
     getProductCountAdminSearch: (search) => {
         return new Promise((resolve, reject) => {
-            db.get().collection(collections.PRODUCTS).countDocuments({
-                name: { $regex: search, $options: 'i' },
-                vendor: false
-            }).then((count) => {
+            const query = search
+                ? { name: { $regex: search, $options: 'i' } }
+                : {}
+            db.get().collection(collections.PRODUCTS).countDocuments(query).then((count) => {
                 resolve(count)
             }).catch((err) => {
                 console.log(err)
+                reject(err)
             })
         })
     },
     getAdminProductsSearch: (search, skip, limit) => {
         return new Promise(async (resolve, reject) => {
-            let products = await db.get().collection(collections.PRODUCTS).find({
-                name: { $regex: search, $options: 'i' },
-                vendor: false
-            }).sort({ _id: -1 }).skip(skip).limit(limit).toArray().catch((err) => {
+            const query = search
+                ? { name: { $regex: search, $options: 'i' } }
+                : {}
+            let products = await db.get().collection(collections.PRODUCTS).find(query).sort({ _id: -1 }).skip(skip).limit(limit).toArray().catch((err) => {
                 reject(err)
             })
-            resolve(products)
+            resolve(await enrichProductsWithVendor(products))
         })
     },
     addCupon: (details) => {
