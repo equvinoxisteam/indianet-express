@@ -4,6 +4,7 @@ import { useRef, Fragment, useEffect, useState, useCallback } from 'react';
 import Server, { vendorAxios } from '../../../Config/Server';
 import ContentControl from '../../../ContentControl/ContentControl'
 import { useRouter } from 'next/router';
+import { COMMISSION_PERCENT, FIXED_FEE_PER_LINE, SETTLEMENT_DAYS, computeLinePlatformFee } from '@/Config/platformFees'
 import ObjectId from 'bson-objectid';
 
 const MAX_PRODUCT_IMAGES = 4
@@ -371,6 +372,29 @@ function AddProduct() {
                 <span className="form-check-label">RFQ only (quote on request)</span>
               </label>
             </div>
+            {!productDetails.allowRfq && (
+              <div className="col-md-12">
+                <div className="alert alert-info mb-3" style={{ borderRadius: '12px' }}>
+                  <strong>Platform pricing (Indianet Express)</strong>
+                  <p className="mb-2 small text-muted">
+                    You set your product price. Customer pays your price + {COMMISSION_PERCENT}% platform fee + ₹{FIXED_FEE_PER_LINE} per item + GST (18%) + Shiprocket shipping.
+                    You receive your full listed price — settled to you every {SETTLEMENT_DAYS} days after order.
+                  </p>
+                  {(() => {
+                    const listPrice = Number(productDetails.variant?.[0]?.price || productDetails.price) || 0
+                    if (listPrice <= 0) return null
+                    const fee = computeLinePlatformFee(listPrice)
+                    return (
+                      <ul className="mb-0 small" style={{ lineHeight: 1.8 }}>
+                        <li>Your price (you receive): <strong>₹{listPrice.toLocaleString('en-IN')}</strong></li>
+                        <li>Platform fee ({COMMISSION_PERCENT}% + ₹{FIXED_FEE_PER_LINE}): <strong>₹{fee.platformFeeTotal.toLocaleString('en-IN')}</strong></li>
+                        <li>Customer pays (excl. GST &amp; shipping): <strong>₹{fee.customerProductPlusFee.toLocaleString('en-IN')}</strong></li>
+                      </ul>
+                    )
+                  })()}
+                </div>
+              </div>
+            )}
             {!productDetails.allowRfq && (
               <div className="d-flex flex-wrap gap-4 mb-3">
                 <label className="form-check">

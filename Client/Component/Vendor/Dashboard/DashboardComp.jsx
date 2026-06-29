@@ -3,6 +3,7 @@ import { useRouter } from "next/router"
 function DashboardComp({ response }) {
     const navigate = useRouter()
     const analytics = response?.analytics || {}
+    const settlement = response?.settlementSummary || {}
     const ordersPending = analytics.ordersPending ?? 0
     const ordersProcessing = analytics.ordersProcessing ?? 0
     const ordersDelivered = analytics.ordersDelivered ?? 0
@@ -13,7 +14,35 @@ function DashboardComp({ response }) {
             <div className="dashboard pb-4">
                 <div className="vendorPageHeader">
                     <h1 className="vendorPageTitle">Seller Dashboard</h1>
-                    <p className="vendorPageSubtitle">Manage products, process orders, and ship to customers across India</p>
+                    <p className="vendorPageSubtitle">Orders, earnings &amp; 30-day settlement</p>
+                </div>
+
+                <div className="panelCard mb-4">
+                    <div className="panelCardHeader">
+                        <h5>Your earnings (after platform fee collected from buyer)</h5>
+                    </div>
+                    <div className="dashboardGrid">
+                        <div className="cardDash">
+                            <h6>Pending settlement (&lt;30 days)</h6>
+                            <h5>₹ {Number(settlement.payoutPending || 0).toLocaleString('en-IN')}</h5>
+                        </div>
+                        <div className="cardDash">
+                            <h6>Due for payout</h6>
+                            <h5>₹ {Number(settlement.payoutDue || 0).toLocaleString('en-IN')}</h5>
+                        </div>
+                        <div className="cardDash">
+                            <h6>Already paid to you</h6>
+                            <h5>₹ {Number(settlement.payoutSettled || 0).toLocaleString('en-IN')}</h5>
+                        </div>
+                        <div className="cardDash">
+                            <h6>Platform fees (from buyers)</h6>
+                            <h5>₹ {Number(settlement.platformFeesCollected || 0).toLocaleString('en-IN')}</h5>
+                        </div>
+                    </div>
+                    <p className="text-muted small mb-0 mt-3">
+                        You list the product price — you receive that full amount. Buyer pays an extra 15% + ₹30 per item (platform fee) + GST + shipping.
+                        Payouts are released after 30 days from order date.
+                    </p>
                 </div>
 
                 <div className="dashboardGrid mb-4">
@@ -41,7 +70,7 @@ function DashboardComp({ response }) {
                     </div>
                     <div className="dashboardGrid">
                         <div className="cardDash">
-                            <h6>Revenue (delivered)</h6>
+                            <h6>Delivered revenue</h6>
                             <h5>₹ {Number(revenue).toLocaleString('en-IN')}</h5>
                         </div>
                         <div className="cardDash">
@@ -60,19 +89,6 @@ function DashboardComp({ response }) {
                             </button>
                         </div>
                     </div>
-                </div>
-
-                <div className="panelCard mb-4">
-                    <div className="panelCardHeader">
-                        <h5>How fulfillment works</h5>
-                    </div>
-                    <ol className="text-muted small mb-0 ps-3" style={{ lineHeight: 1.8 }}>
-                        <li>Customer places order and pays (online or COD).</li>
-                        <li>You receive email &amp; WhatsApp with order details.</li>
-                        <li>Pack the item and mark status as <strong>Processing</strong>, then <strong>Shipped</strong>.</li>
-                        <li>Shiprocket picks up from your warehouse PIN and delivers to the buyer.</li>
-                        <li>Buyer tracks shipment from their account — you can view AWB in order details.</li>
-                    </ol>
                 </div>
             </div>
         </div>

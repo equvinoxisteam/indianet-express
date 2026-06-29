@@ -15,6 +15,7 @@ import trackProduct, { orderStatusControl } from "../ShipRocket/trackProduct.js"
 import { notifyOrderStatusChanged, getOrderLineForNotify } from "../Helpers/orderNotifications.js";
 import vendorPlan from '../Helpers/vendorPlan.js'
 import { VENDOR_PLAN_KEYS, VENDOR_PLANS, getPlanCatalogForClient } from '../Config/vendorPlans.js'
+import settlement from '../Helpers/settlement.js'
 
 var router = express.Router()
 
@@ -50,10 +51,36 @@ router.get('/getDashboard', CheckAdmin, async (req, res) => {
         res.status(500).json('err')
     })
 
+    let settlements = await settlement.getAdminSettlementSummary().catch(() => null)
+
     res.status(200).json({
         total: total,
-        Orders: orders
+        Orders: orders,
+        settlements,
     })
+})
+
+router.get('/getSettlements', CheckAdmin, async (req, res) => {
+    try {
+        const data = await settlement.getAdminSettlementSummary()
+        res.status(200).json(data)
+    } catch {
+        res.status(500).json('err')
+    }
+})
+
+router.put('/markSettlementPaid', CheckAdmin, async (req, res) => {
+    const { userId, secretOrderId, vendorId } = req.body
+    if (!userId || !secretOrderId || !vendorId) {
+        return res.status(400).json('err')
+    }
+    try {
+        const result = await settlement.markSettlementPaid({ userId, secretOrderId, vendorId })
+        if (result.matchedCount === 0) return res.status(404).json('err')
+        res.status(200).json({ ok: true })
+    } catch {
+        res.status(500).json('err')
+    }
 })
 
 //Account 

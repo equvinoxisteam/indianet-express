@@ -3,6 +3,7 @@ import collections from '../Config/Collection.js'
 import bcrypt from 'bcrypt'
 import { ObjectId } from 'mongodb'
 import estimateShippingCost from '../ShipRocket/estimateShipping.js'
+import { computeCheckoutTotals, enrichOrderItemsWithPlatformFees } from './platformCommission.js'
 
 const GST_RATE = 0.18
 
@@ -766,8 +767,15 @@ export default {
                         totalPrice: 0,
                         totalDiscount: 0,
                         totalMrp: 0,
+                        subtotal: 0,
+                        platformFees: 0,
+                        platformPercentTotal: 0,
+                        platformFixedTotal: 0,
+                        commissionPercent: 15,
+                        fixedFeePerLine: 30,
                         shippingAmount: 0,
-                        gstAmount: 0
+                        gstAmount: 0,
+                        gstPercent: 18,
                     })
                     return
                 }
@@ -775,6 +783,7 @@ export default {
                 let subtotal = 0
                 let totalDiscount = 0
                 let totalMrp = 0
+                const lineSellingPrices = []
 
                 for (const line of lines) {
                     const qty = toFiniteNumber(line.quantity, 0)
@@ -790,9 +799,9 @@ export default {
                     subtotal += lineSelling
                     totalMrp += lineMrp
                     totalDiscount += (lineMrp - lineSelling)
+                    lineSellingPrices.push(lineSelling)
                 }
 
-                const gstAmount = computeGstAmount(subtotal)
                 let shippingAmount = 0
 
                 if (delivery_pincode) {
@@ -848,15 +857,25 @@ export default {
                     }
                 }
 
-                const totalPrice = subtotal + gstAmount + shippingAmount
+                const totals = computeCheckoutTotals({
+                    lineSellingPrices,
+                    shippingAmount,
+                })
 
                 resolve({
                     _id: '',
-                    totalPrice: trunc1(totalPrice),
+                    totalPrice: totals.totalPrice,
                     totalDiscount: trunc1(totalDiscount),
                     totalMrp: trunc1(totalMrp),
-                    shippingAmount: trunc1(shippingAmount),
-                    gstAmount: trunc1(gstAmount)
+                    subtotal: totals.subtotal,
+                    platformFees: totals.platformFees,
+                    platformPercentTotal: totals.platformPercentTotal,
+                    platformFixedTotal: totals.platformFixedTotal,
+                    commissionPercent: totals.commissionPercent,
+                    fixedFeePerLine: totals.fixedFeePerLine,
+                    shippingAmount: totals.shippingAmount,
+                    gstAmount: totals.gstAmount,
+                    gstPercent: totals.gstPercent,
                 })
             } catch (err) {
                 reject(err)
@@ -1153,6 +1172,8 @@ export default {
                     for (const item of orderItems) item.shippingAmount = 0
                 }
 
+                enrichOrderItemsWithPlatformFees(orderItems)
+
                 orderPayload.order = orderItems
                 resolve(orderPayload)
             } else {
@@ -1268,7 +1289,7 @@ export default {
 
             if (amount.length !== 0) {
                 const subtotal = amount[0].price
-                const gstAmount = computeGstAmount(subtotal)
+                const lineSellingPrices = [subtotal]
 
                 let shippingAmount = 0
                 if (deliveryPin) {
@@ -1308,13 +1329,25 @@ export default {
                     }
                 }
 
+                const totals = computeCheckoutTotals({
+                    lineSellingPrices,
+                    shippingAmount,
+                })
+
                 amount = {
                     _id: 'buy',
-                    totalPrice: trunc1(subtotal + gstAmount + shippingAmount),
+                    totalPrice: trunc1(totals.totalPrice),
                     totalDiscount: trunc1(amount[0].discount),
                     totalMrp: trunc1(amount[0].mrp),
-                    shippingAmount: trunc1(shippingAmount),
-                    gstAmount: trunc1(gstAmount)
+                    subtotal: trunc1(totals.subtotal),
+                    platformFees: trunc1(totals.platformFees),
+                    platformPercentTotal: trunc1(totals.platformPercentTotal),
+                    platformFixedTotal: trunc1(totals.platformFixedTotal),
+                    commissionPercent: totals.commissionPercent,
+                    fixedFeePerLine: totals.fixedFeePerLine,
+                    shippingAmount: trunc1(totals.shippingAmount),
+                    gstAmount: trunc1(totals.gstAmount),
+                    gstPercent: totals.gstPercent,
                 }
             } else {
                 amount = {
@@ -1540,6 +1573,8 @@ export default {
                 } else {
                     for (const item of orderItems) item.shippingAmount = 0
                 }
+
+                enrichOrderItemsWithPlatformFees(orderItems)
 
                 orderPayload.order = orderItems
                 resolve(orderPayload)

@@ -81,6 +81,26 @@ function EditOrder({ Order, onUpdated }) {
                         <input type="text" className="form-control" value={Order.variantSize || '—'} readOnly disabled />
                     </div>
 
+                    <div className='col-12'><h3 className="settingsProfileCardTitle">Earnings &amp; settlement</h3></div>
+                    <div className='col-12 col-md-4'>
+                        <label className="form-label fw-semibold">Your payout (you receive)</label>
+                        <input type="text" className="form-control" value={`₹ ${Number(Order.vendorPayout ?? Order.selling_price ?? 0).toLocaleString('en-IN')}`} readOnly disabled />
+                    </div>
+                    <div className='col-12 col-md-4'>
+                        <label className="form-label fw-semibold">Platform fee (from buyer)</label>
+                        <input type="text" className="form-control" value={`₹ ${Number(Order.platformFeeTotal ?? 0).toLocaleString('en-IN')}`} readOnly disabled />
+                    </div>
+                    <div className='col-12 col-md-4'>
+                        <label className="form-label fw-semibold">Settlement status</label>
+                        <input type="text" className="form-control" value={Order.settlementStatus || 'pending'} readOnly disabled />
+                    </div>
+                    {Order.settlementDueAt && (
+                        <div className='col-12 col-md-6'>
+                            <label className="form-label fw-semibold">Payout due date (30 days)</label>
+                            <input type="text" className="form-control" value={new Date(Order.settlementDueAt).toLocaleDateString()} readOnly disabled />
+                        </div>
+                    )}
+
                     <div className='col-12'><h3 className="settingsProfileCardTitle">Payment & product</h3></div>
                     <div className='col-12 col-md-6'>
                         <label className="form-label fw-semibold">Payment</label>

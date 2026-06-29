@@ -17,6 +17,7 @@ import deleteFolder from "../Helpers/deleteFolder.js";
 import trackProduct, { orderStatusControl } from "../ShipRocket/trackProduct.js";
 import { notifyOrderStatusChanged, getOrderLineForNotify } from "../Helpers/orderNotifications.js";
 import tokenShipRocket from "../ShipRocket/token.js";
+import settlement from "../Helpers/settlement.js";
 import XLSX from "xlsx";
 
 var router = express.Router()
@@ -117,11 +118,17 @@ router.get('/getDashboard', CheckVendor, async (req, res) => {
         planAccess = { ...vendorPlan.getPlanAccess(vendorDoc), showcaseUsed }
     } catch (_) { /* optional */ }
 
+    let settlementSummary = null
+    try {
+        settlementSummary = await settlement.getVendorSettlementSummary(req.body.vendorId)
+    } catch (_) { /* optional */ }
+
     res.status(200).json({
         total: total,
         Orders: orders,
         analytics: analytics,
         planAccess,
+        settlementSummary,
         loaded: true
     })
 })

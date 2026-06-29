@@ -6,6 +6,7 @@ import ContentControl from '../../../ContentControl/ContentControl'
 import { useRouter } from 'next/router'
 import Modal from './Modal'
 import toast from 'react-hot-toast'
+import PriceBreakdown from './PriceBreakdown'
 
 function CheckoutComp({
     amount, setAmount,
@@ -447,26 +448,7 @@ function CheckoutComp({
                                                             <h6 className='UserGrayMain font-bold'>PRICE DETAILS</h6>
                                                         </div>
                                                         <div className='lastDiv'>
-                                                            <div className='AmtDiv'>
-                                                                <div>
-                                                                    <p>Price (Subtotal)</p>
-                                                                    <p>Discount</p>
-                                                                    <p>Shipping</p>
-                                                                    <p>GST (18%)</p>
-                                                                    <p>MRP</p>
-                                                                    <h6 className='font-bold'>Total Amount</h6>
-                                                                </div>
-
-                                                                <div>
-                                                                    <p>₹ {Math.max(0, (amount.totalPrice ?? 0) - (amount.shippingAmount ?? 0) - (amount.gstAmount ?? 0))}</p>
-                                                                    <p>₹ {amount.totalDiscount}</p>
-                                                                    <p>₹ {amount.shippingAmount ?? 0}</p>
-                                                                    <p>₹ {amount.gstAmount ?? 0}</p>
-                                                                    <p>₹ {amount.totalMrp}</p>
-                                                                    <h6 className='font-bold'>₹ {amount.totalPrice}</h6>
-                                                                </div>
-
-                                                            </div>
+                                                            <PriceBreakdown amount={amount} />
                                                         </div>
 
                                                         <div className='cuponInDiv'>
@@ -793,22 +775,7 @@ function CheckoutComp({
                                                         <h6 className='UserGrayMain font-bold'>PRICE DETAILS</h6>
                                                     </div>
                                                     <div className='lastSub'>
-                                                        <div className='AmtDiv'>
-                                                            <div>
-                                                                <p>Price </p>
-                                                                <p>Discount</p>
-                                                                <p>MRP </p>
-                                                                <h6 className='font-bold'>Total Amount</h6>
-                                                            </div>
-
-                                                            <div>
-                                                                <p>₹ {amount.totalPrice}</p>
-                                                                <p>₹ {amount.totalDiscount}</p>
-                                                                <p>₹ {amount.totalMrp}</p>
-                                                                <h6 className='font-bold'>₹ {amount.totalPrice}</h6>
-                                                            </div>
-
-                                                        </div>
+                                                        <PriceBreakdown amount={amount} />
                                                     </div>
 
                                                     <div className='cuponInDiv'>

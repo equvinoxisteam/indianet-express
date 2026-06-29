@@ -129,7 +129,32 @@ Vendor packs → marks Shipped
 
 ---
 
-## 8. Deploy after code push
+## 8. Platform commission & settlement
+
+**Default fees** (configurable in Railway backend env):
+- `PLATFORM_COMMISSION_PERCENT=15` — 15% of product line total
+- `PLATFORM_FIXED_FEE=30` — ₹30 per cart line / order item
+- `SETTLEMENT_DAYS=30` — vendor payout after 30 days
+
+### Example order (1 product, qty 1)
+
+| Line | Amount |
+|------|--------|
+| Product price (vendor receives) | ₹1,000 |
+| Platform fee (15% + ₹30) | ₹180 |
+| GST 18% on product | ₹180 |
+| Shiprocket shipping | ₹65 (example) |
+| **Customer pays** | **₹1,425** |
+
+- **Platform keeps:** ₹180  
+- **Vendor receives (after 30 days):** ₹1,000  
+- **GST + shipping:** passed through as shown at checkout  
+
+Admin marks vendor payouts in **Admin → Settlements** when due.
+
+---
+
+## 9. Deploy after code push
 
 1. Push to `indianet-express` repo on GitHub
 2. Railway auto-redeploys Client + SERVER services

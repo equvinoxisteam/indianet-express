@@ -22,6 +22,7 @@ import trackProduct, { orderStatusControl } from "../ShipRocket/trackProduct.js"
 import layout from "../Helpers/layout.js";
 import uploader from "../Helpers/uploader.js";
 import { notifyOrderPlaced } from "../Helpers/orderNotifications.js";
+import { getPlatformFeeConfig } from "../Helpers/platformCommission.js";
 var router = express.Router()
 
 function afterOrderPlaced(userId, orderPayload, customer) {
@@ -403,6 +404,10 @@ router.get('/shopCategories', (req, res) => {
     }).catch(() => {
         res.status(500).json('err')
     })
+})
+
+router.get('/platformFees', (req, res) => {
+    res.status(200).json(getPlatformFeeConfig())
 })
 
 router.get('/getLayouts', async (req, res) => {

@@ -21,6 +21,7 @@ const adminNavItems = [
         label: 'Commerce',
         items: [
             { href: '/admin/orders', icon: 'fa-solid fa-shopping-bag', label: 'Orders' },
+            { href: '/admin/settlements', icon: 'fa-solid fa-indian-rupee-sign', label: 'Settlements' },
             { href: '/admin/cupons', icon: 'fa-solid fa-ticket', label: 'Coupons' },
         ]
     },
