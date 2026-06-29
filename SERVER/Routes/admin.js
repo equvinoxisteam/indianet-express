@@ -134,13 +134,7 @@ router.post('/addProduct', CheckAdmin, uploader.products.array("images", 20), (r
     req.body.vendor = false
     req.body.allowCod = req.body.allowCod === 'true' || req.body.allowCod === true
     req.body.allowOnline = req.body.allowOnline === 'true' || req.body.allowOnline === true
-    req.body.allowRfq = req.body.allowRfq === 'true' || req.body.allowRfq === true
-
-    // RFQ products are private-price only; never allow cart checkout actions.
-    if (req.body.allowRfq === true) {
-        req.body.allowCod = false
-        req.body.allowOnline = false
-    }
+    req.body.allowRfq = false
 
     // ShipRocket shipment weight/dim (used for shipping estimate + label creation)
     const weightKg = parseFloat(req.body.weightKg)
@@ -186,13 +180,7 @@ router.put('/editProduct/:id', CheckAdmin, uploader.products.array("images", 20)
         data.discount = parseInt(discountPerc);
         data.allowCod = data.allowCod === 'true' || data.allowCod === true
         data.allowOnline = data.allowOnline === 'true' || data.allowOnline === true
-        data.allowRfq = data.allowRfq === 'true' || data.allowRfq === true
-
-        // RFQ products are private-price only; never allow cart checkout actions.
-        if (data.allowRfq === true) {
-            data.allowCod = false
-            data.allowOnline = false
-        }
+        data.allowRfq = false
 
         // ShipRocket shipment weight/dim (used for shipping estimate + label creation)
         const weightKg2 = parseFloat(data.weightKg)

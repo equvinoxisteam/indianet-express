@@ -49,7 +49,7 @@ export async function notifyOrderPlaced({ userId, orderItems, customer }) {
     if (buyerPhone) {
         await sendWhatsAppMessage({
             to: buyerPhone,
-            body: `Indianet: Order #${firstOrderId} confirmed! Total ₹${total}. Payment: ${payType === 'online' ? 'Online' : 'COD'}. Track at ${process.env.CLIENT_URL || ''}/orders`,
+            body: `Indianet Express: Order #${firstOrderId} confirmed! Total ₹${total}. Payment: ${payType === 'online' ? 'Online' : 'COD'}. Track at ${process.env.CLIENT_URL || ''}/orders`,
         })
     }
 
@@ -74,7 +74,7 @@ export async function notifyOrderPlaced({ userId, orderItems, customer }) {
                 if (vendorDoc.phone || vendorDoc.mobile) {
                     await sendWhatsAppMessage({
                         to: vendorDoc.phone || vendorDoc.mobile,
-                        body: `Indianet: New order #${line.OrderId || line.secretOrderId} — ${line.proName} x${line.quantity}. Customer: ${buyerName}, ${buyerPhone || ''}`,
+                        body: `Indianet Express: New order #${line.OrderId || line.secretOrderId} — ${line.proName} x${line.quantity}. Customer: ${buyerName}, ${buyerPhone || ''}`,
                     })
                 }
             }
@@ -134,7 +134,7 @@ export async function notifyOrderStatusChanged({ userId, secretOrderId, newStatu
             Cancelled: 'cancelled',
         }
         const msg = statusMsg[newStatus] || newStatus
-        let body = `Indianet: Order #${orderId} is ${msg}.`
+        let body = `Indianet Express: Order #${orderId} is ${msg}.`
         if (trackUrl) body += ` Track: ${trackUrl}`
         await sendWhatsAppMessage({ to: buyerPhone, body })
     }

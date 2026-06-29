@@ -1,4 +1,4 @@
-const BRAND = 'Indianet'
+const BRAND = 'Indianet Express'
 const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || process.env.ADMIN_MAIL || 'team@equvinoxis.com'
 const ACCENT = '#0f253d'
 const ACCENT_LIGHT = '#1a4a6e'

@@ -13,7 +13,6 @@ import CheckPinModal from './CheckPinModal'
 import { useRouter } from 'next/router'
 import toast from 'react-hot-toast';
 import Swal from 'sweetalert2';
-import RfqModal from './RfqModal';
 import CategoryPath, { splitCategoryPath } from '@/Component/Common/CategoryPath';
 
 function VendorLogoAvatar({ logo, size = 60 }) {
@@ -81,11 +80,10 @@ function ProductComp() {
   const magnifieWidth = 150;
   const zoomLevel = 2;
 
-  const [rfqModalOpen, setRfqModalOpen] = useState(false);
   const [selectedVariantId, setSelectedVariantId] = useState('');
 
   // Initialize flags safely
-  const canRfq = product?.allowRfq === true;
+  const canRfq = false;
   const variants = Array.isArray(product?.variant) ? product.variant : [];
   const selectedVariant = variants.find((v) => (v.id || v._id) === selectedVariantId) || variants[0] || null;
   const selectedVariantLabel = selectedVariant
@@ -272,15 +270,6 @@ function ProductComp() {
   return (
     <>
       {showReviewModal.active && <ReviewModal product={product} setShowReviewModal={setShowReviewModal} getReviews={getReviews} />}
-      {rfqModalOpen && (
-        <RfqModal
-          show={rfqModalOpen}
-          setShow={setRfqModalOpen}
-          product={product}
-          selectedVariant={selectedVariant}
-          selectedVariantLabel={selectedVariantLabel}
-        />
-      )}
       
       <div className='ProductComp singleProduct'>
         <div className="container">
@@ -367,49 +356,15 @@ function ProductComp() {
                   )}
                 </div>
 
-                {!canRfq ? (
-                  <div className="PriceSection mb-4">
-                    <h2 className="text-primary font-bold mb-0">₹ {product.price}</h2>
-                    <div className="text-muted small">
-                      <del className="me-2">₹ {product.mrp}</del>
+                <div className="PriceSection mb-4">
+                  <h2 className="text-primary font-bold mb-0">₹ {selectedVariant?.price ?? product.price}</h2>
+                  <div className="text-muted small">
+                    <del className="me-2">₹ {selectedVariant?.mrp ?? product.mrp}</del>
+                    {product.discount > 0 && (
                       <span className="badge bg-danger-subtle text-danger">Save {product.discount}%</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="PriceSection mb-4">
-                    <div className="rfqPriceHeader">
-                      <h2 className="text-primary font-bold mb-0">RFQ Pricing</h2>
-                    </div>
-                    {selectedVariant && selectedVariant.price ? (
-                      <div className="small text-muted mt-1">
-                        Base quote for <span className="fw-bold text-dark">{selectedVariantLabel}</span>: <span className="fw-bold text-primary">₹{selectedVariant.price}</span>
-                        {selectedVariant.mrp ? <span className="ms-2 text-decoration-line-through text-secondary">₹{selectedVariant.mrp}</span> : null}
-                      </div>
-                    ) : null}
-                    {product.rfqTiers && product.rfqTiers.length > 0 ? (
-                      <div className="rfqTierGrid mt-3">
-                        {product.rfqTiers.map((tier, index) => (
-                            <div key={index} className="rfqTierCard">
-                                <div className="rfqTierQty text-muted small">
-                                    {tier.maxQty ? `${tier.minQty} - ${tier.maxQty} pieces` : `MOQ ${tier.minQty || 1}+ pieces`}
-                                </div>
-                                <h5 className="rfqTierPrice text-primary mb-0">₹{tier.price}</h5>
-                            </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-muted small mt-2">RFQ pricing is shared upon request.</div>
                     )}
-                    <div className="rfqInfoGrid mt-3">
-                      {rfqInfoItems.map(([label, value]) => (
-                        <div key={label} className="rfqInfoItem">
-                          <span className="rfqInfoLabel">{label}</span>
-                          <span className="rfqInfoValue">{value}</span>
-                        </div>
-                      ))}
-                    </div>
                   </div>
-                )}
+                </div>
 
                 <div className="mb-4">
                   <h6 className="font-bold mb-2">Short Description</h6>
@@ -470,13 +425,7 @@ function ProductComp() {
                     </>
                   )}
 
-                  {canRfq && (
-                    <button className="btn btn-dark rounded-pill font-bold py-2" onClick={() => setRfqModalOpen(true)}>
-                      Request Quote
-                    </button>
-                  )}
-
-                  {!canPurchase && !canRfq && product.available === 'true' && (
+                  {!canPurchase && product.available === 'true' && (
                     <div className="alert alert-info py-2 small mb-0">
                       Contact support for purchasing terms.
                     </div>
@@ -489,8 +438,7 @@ function ProductComp() {
                   )}
                 </div>
 
-                {!canRfq && (
-                  <div className="ProductMetadata border-top mt-4 pt-4 d-flex gap-4">
+                <div className="ProductMetadata border-top mt-4 pt-4 d-flex gap-4">
                     <div className="small">
                       <span className="text-muted d-block">COD Available</span>
                       {canBuyCod ? <span className="text-success fw-bold">Yes</span> : <span className="text-danger fw-bold">No</span>}
@@ -504,8 +452,7 @@ function ProductComp() {
                       {product.return === 'true' ? <span className="text-success fw-bold">7 Days</span> : <span className="text-danger fw-bold">No</span>}
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
             </div>
           </div>
 

@@ -1,7 +1,8 @@
 import Link from 'next/link'
+import { BRAND_NAME } from '@/Config/brand'
 
 /**
- * Indianet wordmark + logo for headers and auth screens.
+ * Indianet Express wordmark for headers and auth screens.
  * @param {'default' | 'light'} variant - light: white text on blue/dark bars
  */
 export default function BrandLogo({ href = '/', variant = 'default', className = '' }) {
@@ -15,7 +16,7 @@ export default function BrandLogo({ href = '/', variant = 'default', className =
     >
       <img
         src="/logo_bg.jpg"
-        alt="Indianet"
+        alt={BRAND_NAME}
         width={40}
         height={40}
         style={{ objectFit: 'contain', borderRadius: 8, flexShrink: 0 }}
@@ -31,7 +32,7 @@ export default function BrandLogo({ href = '/', variant = 'default', className =
           whiteSpace: 'nowrap',
         }}
       >
-        Indianet
+        {BRAND_NAME}
       </span>
     </Tag>
   )

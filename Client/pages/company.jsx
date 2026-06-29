@@ -31,7 +31,7 @@ function Company() {
     return (
         <Fragment>
             <Head>
-                <title>About Indianet — Our Mission</title>
+                <title>About Indianet Express — Shop Industrial Products Online</title>
                 <meta name="description" content="Learn about Indianet — the B2B marketplace built for brands, vendors, and industrial buyers." />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
             </Head>
@@ -40,9 +40,9 @@ function Company() {
 
                 <section className={style.hero}>
                     <div className="container">
-                        <h1>About Indianet</h1>
+                        <h1>About Indianet Express</h1>
                         <p>
-                            The marketplace where ambitious brands meet serious B2B buyers — built for industrial trade, trusted partnerships, and long-term growth.
+                            Your trusted industrial e-commerce store — browse machinery and parts, order online, and get reliable delivery across India.
                         </p>
                     </div>
                 </section>

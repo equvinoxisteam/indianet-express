@@ -21,7 +21,7 @@ const vendorNavItems = [
     {
         label: 'Commerce',
         items: [
-            { href: '/vendor/rfq', icon: 'fa-solid fa-file-invoice', label: 'RFQs' },
+            { href: '/vendor/orders', icon: 'fa-solid fa-shopping-bag', label: 'Orders' },
         ]
     },
     {

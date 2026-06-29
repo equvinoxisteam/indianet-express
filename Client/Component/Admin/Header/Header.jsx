@@ -22,7 +22,6 @@ const adminNavItems = [
         items: [
             { href: '/admin/orders', icon: 'fa-solid fa-shopping-bag', label: 'Orders' },
             { href: '/admin/cupons', icon: 'fa-solid fa-ticket', label: 'Coupons' },
-            { href: '/admin/rfq', icon: 'fa-solid fa-file-invoice', label: 'RFQs' },
         ]
     },
     {

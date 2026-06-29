@@ -62,7 +62,7 @@ function CheckoutComp({
             "key": razorpayKey,
             "amount": data.totalAmount,
             "currency": "INR",
-            "name": "Indianet",
+            "name": "Indianet Express",
             "description": "Order payment",
             "order_id": data.razOrderId,
             "handler": function (response) {

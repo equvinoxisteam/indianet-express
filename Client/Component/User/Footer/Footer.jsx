@@ -3,6 +3,7 @@ import Link from 'next/link';
 import style from './Footer.module.scss'
 import BrandLogo from '@/Component/Common/BrandLogo';
 import { SITE_SOCIAL_LINKS } from '@/Config/GlobalData';
+import { BRAND_NAME, BRAND_TAGLINE } from '@/Config/brand'
 
 function Footer() {
     const [year, setYear] = useState('')
@@ -20,8 +21,8 @@ function Footer() {
                             <div className={style.FooterBrand}>
                                 <BrandLogo variant="light" href="/" />
                                 <p className={style.brandDesc}>
-                                    Indianet is the B2B marketplace where your brand meets serious buyers.
-                                    Source industrial machinery, list with confidence, and scale with verified partners worldwide.
+                                    {BRAND_NAME} is your industrial e-commerce store — browse machinery and parts,
+                                    order online with secure payment, and get reliable shipping across India.
                                 </p>
                                 <ul className={style.brandHighlights}>
                                     <li><i className="fa-solid fa-check"></i> Verified sellers &amp; secure sourcing</li>
@@ -40,7 +41,7 @@ function Footer() {
                         </div>
 
                         <div className="col-6 col-md-4 col-lg-3 mb-4">
-                            <h6 className={style.FooterHeading}>Sell on Indianet</h6>
+                            <h6 className={style.FooterHeading}>Sell on {BRAND_NAME}</h6>
                             <ul className={style.FooterItems}>
                                 <li><Link href="/vendor/register">Register as Vendor</Link></li>
                                 <li><Link href="/vendor/login">Vendor Login</Link></li>
@@ -51,7 +52,7 @@ function Footer() {
                             <h6 className={style.FooterHeading}>Company</h6>
                             <ul className={style.FooterItems}>
                                 <li><Link href="/help">Help &amp; FAQs</Link></li>
-                                <li><Link href="/company">About Indianet</Link></li>
+                                <li><Link href="/company">About {BRAND_NAME}</Link></li>
                                 <li><Link href="/categories">Browse Categories</Link></li>
                                 <li><Link href="/privacy-policy">Privacy Policy</Link></li>
                             </ul>
@@ -61,7 +62,7 @@ function Footer() {
                     <div className={style.FooterSocialRow}>
                         <div>
                             <h6 className={style.FooterHeading}>Connect With Us</h6>
-                            <p className={style.socialNote}>Follow Indianet for product updates, industry news, and seller success stories.</p>
+                            <p className={style.socialNote}>Follow {BRAND_NAME} for deals, new arrivals, and seller updates.</p>
                         </div>
                         <ul className={style.FooterSMicons}>
                             <li>
@@ -91,7 +92,7 @@ function Footer() {
                 <hr className={style.FooterDivider} />
                 <div className="container">
                     <div className={style.CopyRightArea}>
-                        <p className={style.copyMain}>&#169; {year} Indianet. All rights reserved.</p>
+                        <p className={style.copyMain}>&#169; {year} {BRAND_NAME}. All rights reserved.</p>
                         <p className={style.copySub}>
                             By using this site you agree to our policies. For questions about your account or listings, visit{' '}
                             <Link href="/help">Help &amp; FAQs</Link>.

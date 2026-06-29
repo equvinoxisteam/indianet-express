@@ -53,13 +53,9 @@ const COUNTRY_RULES = {
 }
 
 function parseVendorCommerceFlags(body) {
-    body.allowCod = body.allowCod === 'true' || body.allowCod === true
-    body.allowOnline = body.allowOnline === 'true' || body.allowOnline === true
-    body.allowRfq = body.allowRfq === 'true' || body.allowRfq === true
-    if (body.allowRfq) {
-        body.allowCod = false
-        body.allowOnline = false
-    }
+    body.allowRfq = false
+    body.allowCod = body.allowCod === 'false' || body.allowCod === false ? false : true
+    body.allowOnline = body.allowOnline === 'false' || body.allowOnline === false ? false : true
     return body
 }
 

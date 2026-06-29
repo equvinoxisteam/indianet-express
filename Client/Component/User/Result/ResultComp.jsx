@@ -157,13 +157,13 @@ function ResultComp({
                             <div>
                               <CategoryPath category={obj.category} variant="card" />
                               <h6 className={style.oneLineTxt + ' ' + style.productTitle}>{obj.name}</h6>
-                              {obj.allowRfq === true ? (
-                                <div className={style.PriceSpan}><span className={style.sale + ' ' + style.enquiryText}>RFQ Product</span></div>
-                              ) : (
+                              {obj.available === "true" ? (
                                 <div className={style.PriceSpan}>
                                   <span className={style.mrp}><del>₹ {obj.mrp}</del></span>
                                   <span className={style.sale}>₹ {obj.price}</span>
                                 </div>
+                              ) : (
+                                <div className={style.PriceSpan}><span className={style.enquiryText}>Unavailable</span></div>
                               )}
                             </div>
                           </Link>
@@ -177,13 +177,7 @@ function ResultComp({
                               Quick View
                             </button>
 
-                            {obj.allowRfq === true ? (
-                                <Link href={'/p/' + obj.slug + '/' + obj._id} className={style.rfqBtnLink}>
-                                  <button className={style.rfqBtn}>
-                                    Full Details
-                                  </button>
-                                </Link>
-                              ) : obj.available === "true" ? (
+                            {obj.available === "true" ? (
                                 <button className={style.addToCartBtn} onClick={() => {
                                   if (!userLogged.status) {
                                     setLoginModal(obj => ({ ...obj, btn: true, active: true, member: true, forgot: false }))

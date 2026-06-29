@@ -14,7 +14,7 @@ export async function sendTemplatedMail({ to, subject, text, html, from }) {
 
     try {
         await sendMail({
-            from: from || process.env.MAIL_FROM || `Indianet <${process.env.MAIL_USER}>`,
+            from: from || process.env.MAIL_FROM || `Indianet Express <${process.env.MAIL_USER || process.env.GMAIL_USER}>`,
             to,
             subject,
             text,
