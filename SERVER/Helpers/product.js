@@ -96,6 +96,7 @@ export default {
                     $unwind: "$mainSub"
                 }, {
                     $project: {
+                        _id: '$_id',
                         name: '$mainSub.name',
                         category: '$mainSub.category',
                         uni_id: '$mainSub.uni_id',
@@ -116,6 +117,7 @@ export default {
                     $unwind: '$mainSub'
                 }, {
                     $project: {
+                        _id: '$_id',
                         name: '$mainSub.name',
                         uni_id: '$mainSub.uni_id',
                         slug: '$mainSub.slug',
