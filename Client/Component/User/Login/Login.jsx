@@ -11,7 +11,7 @@ import { Countries } from '../../../Config/GlobalData';
 
 function Login({ LoginModal, setLoginModal }) {
 
-    const { setUserLogged } = useContext(ContentControl)
+    const { setUserLogged, refreshHeaderCounts } = useContext(ContentControl)
 
     const [showBtnSign, setShowBtnSign] = useState(true)
     const [showBtnLogin, setShowBtnLogin] = useState(true)
@@ -150,6 +150,7 @@ function Login({ LoginModal, setLoginModal }) {
                     }).then((res) => {
                         if (res.data.status) {
                             setUserLogged(res.data)
+                            refreshHeaderCounts(res.data._id)
                             setLoginModal({ ...LoginModal, active: false })
                             toast.success("Login successful")
                         } else {

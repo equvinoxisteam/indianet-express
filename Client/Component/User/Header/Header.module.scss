@@ -40,15 +40,21 @@
         }
 
         .topLeft {
-            h5 {
+            .topHelpLink {
                 font-size: 0.75rem;
                 font-weight: $font-weight-medium;
                 color: $neutral-500;
-                margin: 0;
+                text-decoration: none;
                 display: flex;
                 align-items: center;
                 gap: 6px;
+                transition: color $transit-fast;
+
                 i { color: $primary; }
+
+                &:hover {
+                    color: $primary;
+                }
             }
         }
 
@@ -216,6 +222,78 @@
             @media (max-width: 900px) {
                 padding: 0 10px;
                 font-size: 0.75rem;
+            }
+        }
+
+        .iconActionBtn {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: $radius-md;
+            border: 1.5px solid $neutral-200;
+            background: $surface-white;
+            color: $primary;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all $transit-fast;
+            font-size: 1rem;
+            flex-shrink: 0;
+
+            &:hover {
+                border-color: $primary;
+                background: $neutral-50;
+            }
+        }
+
+        .iconBadge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: $radius-full;
+            background: $brand-orange;
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: $font-weight-bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .ordersBtn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 38px;
+            padding: 0 12px;
+            border-radius: $radius-md;
+            border: 1.5px solid $neutral-200;
+            background: $surface-white;
+            color: $neutral-700;
+            font-size: 0.8rem;
+            font-weight: $font-weight-semibold;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all $transit-fast;
+            font-family: inherit;
+
+            i { font-size: 0.85rem; color: $primary; }
+
+            &:hover {
+                border-color: $primary;
+                color: $primary;
+            }
+
+            @media (max-width: 1100px) {
+                span { display: none; }
+                width: 40px;
+                padding: 0;
+                justify-content: center;
             }
         }
 
@@ -768,8 +846,42 @@
             gap: 6px;
         }
 
-        .MobMenuBar,
         .mobIconBtn {
+            background: none;
+            border: none;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: $radius-md;
+            cursor: pointer;
+            color: $neutral-700;
+            transition: background $transit-fast;
+            padding: 0;
+            position: relative;
+
+            &:hover { background: $neutral-100; }
+        }
+
+        .mobBadge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 4px;
+            border-radius: $radius-full;
+            background: $brand-orange;
+            color: #fff;
+            font-size: 0.6rem;
+            font-weight: $font-weight-bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .MobMenuBar {
             background: none;
             border: none;
             width: 38px;

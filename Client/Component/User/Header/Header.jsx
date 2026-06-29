@@ -88,8 +88,8 @@ function Header() {
     const [timeDate, setTimeDate] = useState('')
 
     const { userLogged, setUserLogged,
-        LoginModal, setLoginModal, cartTotal, 
-        allCategories, headerCategories } = useContext(ContentControl)
+        LoginModal, setLoginModal, cartTotal, cartCount, wishlistCount,
+        allCategories, headerCategories, refreshHeaderCounts } = useContext(ContentControl)
 
     const [search, setSearch] = useState('')
     const navigate = useRouter()
@@ -140,6 +140,30 @@ function Header() {
     function goAccount() {
         if (userLogged.status) {
             navigate.push('/account')
+        } else {
+            openLoginModal(true)
+        }
+    }
+
+    function goCart() {
+        if (userLogged.status) {
+            navigate.push('/cart')
+        } else {
+            openLoginModal(true)
+        }
+    }
+
+    function goWishlist() {
+        if (userLogged.status) {
+            navigate.push('/wishlist')
+        } else {
+            openLoginModal(true)
+        }
+    }
+
+    function goOrders() {
+        if (userLogged.status) {
+            navigate.push('/orders')
         } else {
             openLoginModal(true)
         }
@@ -197,11 +221,7 @@ function Header() {
     return (
         <Fragment>
             {
-                !userLogged.status && (
-                    <>
-                        {LoginModal.active && <Login LoginModal={LoginModal} setLoginModal={setLoginModal} />}
-                    </>
-                )
+                LoginModal.active && <Login LoginModal={LoginModal} setLoginModal={setLoginModal} />
             }
             {menuBar.active && <MenuBar menuBar={{ ...menuBar, categories: allCategories }} setMenuBar={setMenuBar} />}
             <PromoBar />
@@ -211,10 +231,10 @@ function Header() {
                         <div className="container">
                             <div className={style.topFlex}>
                                 <div className={style.topLeft}>
-                                    <h5>
-                                        <i className="fa-solid fa-truck-fast"></i>
-                                        <span>Pan-India Delivery</span>
-                                    </h5>
+                                    <Link href="/help" className={style.topHelpLink}>
+                                        <i className="fa-solid fa-circle-question"></i>
+                                        <span>Help &amp; Support</span>
+                                    </Link>
                                 </div>
                                 <div className={style.topRight}>
                                     <span className={style.dateTime}>{timeDate}</span>
@@ -284,26 +304,40 @@ function Header() {
                                 </div>
                                 <div className={style.actionsCol}>
                                     <div className={style.headerActionsRow}>
+                                        <button type="button" className={style.iconActionBtn} onClick={goWishlist} aria-label="Wishlist" title="Wishlist">
+                                            <i className="fa-regular fa-heart"></i>
+                                            {wishlistCount > 0 && <span className={style.iconBadge}>{wishlistCount}</span>}
+                                        </button>
+                                        <button type="button" className={style.iconActionBtn} onClick={goCart} aria-label="Cart" title="Cart">
+                                            <i className="fa-solid fa-cart-shopping"></i>
+                                            {cartCount > 0 && <span className={style.iconBadge}>{cartCount}</span>}
+                                        </button>
                                         {userLogged.status ? (
-                                            <button type="button" className={style.accountBtn} onClick={goAccount}>
-                                                {userLogged.profileImage ? (
-                                                    <img
-                                                        className={style.actionAvatar}
-                                                        src={`${ServerId}/user/${userLogged._id}/${userLogged.profileImage}`}
-                                                        alt=""
-                                                    />
-                                                ) : (
-                                                    <i className="fa-solid fa-user"></i>
-                                                )}
-                                                <span className={style.accNameMax}>{userLogged.name}</span>
-                                            </button>
+                                            <>
+                                                <button type="button" className={style.ordersBtn} onClick={goOrders} title="My Orders">
+                                                    <i className="fa-solid fa-box"></i>
+                                                    <span>Orders</span>
+                                                </button>
+                                                <button type="button" className={style.accountBtn} onClick={goAccount}>
+                                                    {userLogged.profileImage ? (
+                                                        <img
+                                                            className={style.actionAvatar}
+                                                            src={`${ServerId}/user/${userLogged._id}/${userLogged.profileImage}`}
+                                                            alt=""
+                                                        />
+                                                    ) : (
+                                                        <i className="fa-solid fa-user"></i>
+                                                    )}
+                                                    <span className={style.accNameMax}>{userLogged.name}</span>
+                                                </button>
+                                            </>
                                         ) : (
                                             <>
                                                 <button type="button" className={style.signInBtn} onClick={() => openLoginModal(true)}>
                                                     <i className="fa-solid fa-right-to-bracket"></i>
                                                     <span>Sign In</span>
                                                 </button>
-                                                <Link href="/vendor/login" className={style.signInBtn}>
+                                                <Link href="/vendor/register" className={style.signInBtn}>
                                                     <i className="fa-solid fa-store"></i>
                                                     <span>Sell Now</span>
                                                 </Link>
@@ -386,9 +420,9 @@ function Header() {
 
             <div className={style.UserHeadMob}>
                 <div className={style.subTop}>
-                    <div>
+                    <div className={style.mobTopUtility}>
                         <i className="fa-solid fa-truck-fast"></i>
-                        <span>Pan-India Delivery</span>
+                        <span>Worldwide Delivery</span>
                     </div>
                     {
                         userLogged.status && (
@@ -420,6 +454,14 @@ function Header() {
                                 <BrandLogo href="/" />
                             </div>
                             <div className={style.mobActions}>
+                                <button type="button" className={style.mobIconBtn} onClick={goWishlist} aria-label="Wishlist">
+                                    <i className="fa-regular fa-heart UserBlackMain"></i>
+                                    {wishlistCount > 0 && <span className={style.mobBadge}>{wishlistCount}</span>}
+                                </button>
+                                <button type="button" className={style.mobIconBtn} onClick={goCart} aria-label="Cart">
+                                    <i className="fa-solid fa-cart-shopping UserBlackMain"></i>
+                                    {cartCount > 0 && <span className={style.mobBadge}>{cartCount}</span>}
+                                </button>
                                 <button type="button" className={style.mobIconBtn} onClick={goAccount} aria-label="Account">
                                     {userLogged.status && userLogged.profileImage ? (
                                         <img

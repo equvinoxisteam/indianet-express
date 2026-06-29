@@ -37,7 +37,7 @@ function ProductComp() {
     setQuickVw, QuickVw,
     ImgModal, setImgModal,
     product = {}, similar = [], userLogged, setUserLogged,
-    setLoginModal, setCartTotal, setOrderType, setProduct
+    setLoginModal, setCartTotal, setOrderType, setProduct, refreshHeaderCounts
   } = useContext(ContentControl)
 
   const navigate = useRouter()
@@ -194,6 +194,7 @@ function ProductComp() {
         } else {
           toast.success('Added to cart')
           setCartTotal((amt) => amt + Number(activePrice))
+          refreshHeaderCounts(userLogged._id)
         }
       }).catch(() => toast.error('Could not add to cart'))
     })
@@ -815,6 +816,7 @@ function ProductComp() {
                             item: { proId: obj._id, price: obj.price, mrp: obj.mrp, variantSize: obj.currVariantSize || '' }
                           }).then(() => {
                             toast.success("Added to wishlist");
+                            refreshHeaderCounts(userLogged._id);
                           }).catch(() => {
                             setLoginModal({ btn: true, active: true, member: true });
                           });

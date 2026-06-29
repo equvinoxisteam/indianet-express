@@ -581,6 +581,17 @@ export default {
             resolve(result)
         })
     },
+    getWishlistCount: (userId) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const doc = await db.get().collection(collections.WISHLIST).findOne({ user: userId })
+                const count = Array.isArray(doc?.items) ? doc.items.length : 0
+                resolve(count)
+            } catch (err) {
+                reject(err)
+            }
+        })
+    },
     removeItemWihslist: ({ userId, proId }) => {
         return new Promise((resolve, reject) => {
             db.get().collection(collections.WISHLIST).updateOne({
@@ -678,6 +689,7 @@ export default {
                     $group: {
                         _id: '$user',
                         totalPrice: { $sum: { $multiply: ['$quantity', '$price'] } },
+                        itemCount: { $sum: '$quantity' },
                         totalDiscount: {
                             $sum: {
                                 $multiply: ['$quantity', {
@@ -700,6 +712,7 @@ export default {
 
                         _id: '',
                         totalPrice: 0,
+                        itemCount: 0,
                         totalDiscount: 0,
                         totalMrp: 0
                     }

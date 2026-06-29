@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import style from './PromoBar.module.scss'
 import { BRAND_NAME } from '@/Config/brand'
 
@@ -9,17 +8,12 @@ function PromoBar() {
                 <div className={style.promoInner}>
                     <div className={style.promoLeft}>
                         <i className="fa-solid fa-truck-fast" />
-                        <span>Pan-India delivery via Shiprocket</span>
+                        <span>Worldwide delivery — fast &amp; secure shipping</span>
                     </div>
                     <div className={style.promoCenter}>
                         <span className={style.promoHighlight}>Welcome to {BRAND_NAME}</span>
                         <span className={style.promoDot}>·</span>
-                        <span>Order online · Pay securely · Track your shipment</span>
-                    </div>
-                    <div className={style.promoRight}>
-                        <Link href="/orders">Track Order</Link>
-                        <Link href="/help">Support</Link>
-                        <Link href="/vendor/register">Sell on {BRAND_NAME}</Link>
+                        <span>Order online · Pay securely · Sign in to track orders</span>
                     </div>
                 </div>
             </div>

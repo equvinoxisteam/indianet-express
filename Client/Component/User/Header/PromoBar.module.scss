@@ -10,15 +10,14 @@
 .promoInner {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 1rem;
     padding: 0.45rem 0;
     flex-wrap: wrap;
 }
 
 .promoLeft,
-.promoCenter,
-.promoRight {
+.promoCenter {
     display: flex;
     align-items: center;
     gap: 0.65rem;
@@ -26,12 +25,10 @@
 }
 
 .promoLeft i {
-    color: $brand-orange;
+    color: #fff;
 }
 
 .promoCenter {
-    flex: 1;
-    justify-content: center;
     opacity: 0.95;
 }
 
@@ -44,30 +41,12 @@
     opacity: 0.5;
 }
 
-.promoRight a {
-    color: rgba(255, 255, 255, 0.92);
-    text-decoration: none;
-    font-weight: $font-weight-medium;
-    white-space: nowrap;
-
-    &:hover {
-        color: #fff;
-        text-decoration: underline;
-    }
-}
-
-@media (max-width: 991px) {
+@media (max-width: 767px) {
     .promoCenter {
         display: none;
     }
 
     .promoInner {
-        justify-content: space-between;
-    }
-}
-
-@media (max-width: 575px) {
-    .promoRight a:last-child {
-        display: none;
+        justify-content: flex-start;
     }
 }

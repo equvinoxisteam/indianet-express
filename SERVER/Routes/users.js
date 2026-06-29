@@ -804,6 +804,26 @@ router.get('/getCartTotalPrice', (req, res) => {
     })
 })
 
+router.get('/getHeaderCounts', async (req, res) => {
+    const userId = req.query.userId
+    if (!userId) {
+        return res.status(200).json({ cartCount: 0, wishlistCount: 0, cartTotal: 0 })
+    }
+    try {
+        const [cart, wishlistCount] = await Promise.all([
+            user.getCartTotalPrice(userId),
+            user.getWishlistCount(userId),
+        ])
+        res.status(200).json({
+            cartCount: cart?.itemCount || 0,
+            cartTotal: cart?.totalPrice || 0,
+            wishlistCount: wishlistCount || 0,
+        })
+    } catch {
+        res.status(500).json('err')
+    }
+})
+
 // Order 
 
 router.get('/getCartTotalPriceCheckout', CheckUser, async (req, res) => {

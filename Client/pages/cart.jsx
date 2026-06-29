@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 
 function Cart() {
     const { userLogged, setUserLogged,
-        setLoginModal, setCartTotal, setOrderType
+        setLoginModal, setCartTotal, setOrderType, refreshHeaderCounts
     } = useContext(ContentControl)
 
     const [loaded, setLoaded] = useState(userLogged.status)
@@ -42,6 +42,7 @@ function Cart() {
                     } else {
                         setAmount(res.data.amount)
                         setCartTotal(res.data.amount.totalPrice)
+                        refreshHeaderCounts(userLogged._id)
                         setProducts(res.data.result)
                         setLoaded(true)
                     }

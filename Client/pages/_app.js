@@ -38,6 +38,22 @@ export default function App({ Component, pageProps }) {
   })
 
   const [cartTotal, setCartTotal] = useState(0)
+  const [cartCount, setCartCount] = useState(0)
+  const [wishlistCount, setWishlistCount] = useState(0)
+
+  const refreshHeaderCounts = (userId) => {
+    if (!userId) {
+      setCartTotal(0)
+      setCartCount(0)
+      setWishlistCount(0)
+      return
+    }
+    Server.get('/users/getHeaderCounts', { params: { userId } }).then((res) => {
+      setCartTotal(res.data?.cartTotal || 0)
+      setCartCount(res.data?.cartCount || 0)
+      setWishlistCount(res.data?.wishlistCount || 0)
+    }).catch(() => {})
+  }
 
   let check = router.pathname.split('/')
 
@@ -104,15 +120,7 @@ export default function App({ Component, pageProps }) {
         userCheck(token, (data) => {
           if (data.status) {
             setUserLogged(data)
-            Server.get('/users/getCartTotalPrice', {
-              params: {
-                userId: data._id
-              }
-            }).then((total) => {
-              setCartTotal(total.data.totalPrice)
-            }).catch((err) => {
-              console.log("Something Wrong")
-            })
+            refreshHeaderCounts(data._id)
           } else {
             setUserLogged({ status: false })
             localStorage.removeItem('token')
@@ -144,6 +152,9 @@ export default function App({ Component, pageProps }) {
         userLogged, setUserLogged,
         LoginModal, setLoginModal,
         cartTotal, setCartTotal,
+        cartCount, setCartCount,
+        wishlistCount, setWishlistCount,
+        refreshHeaderCounts,
         setOrderType, OrderType,
         setVendorLogged, venderLogged,
         setAdminLogged, adminLogged,
