@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 
-/** Public seller plans removed — available in vendor dashboard only. */
+/** Public pricing removed — sellers register free on Indianet Express. */
 export default function Pricing() {
     const router = useRouter()
     useEffect(() => {
-        router.replace('/vendor/plans')
+        router.replace('/vendor/register')
     }, [router])
     return null
 }

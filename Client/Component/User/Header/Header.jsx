@@ -7,6 +7,7 @@ import ContentControl from '../../../ContentControl/ContentControl'
 import Login from '../Login/Login'
 import { ServerId } from '@/Config/Server'
 import BrandLogo from '@/Component/Common/BrandLogo'
+import PromoBar from './PromoBar'
 import { useRouter } from 'next/router'
 
 function getVisibleCategoryCount(width, total) {
@@ -203,6 +204,7 @@ function Header() {
                 )
             }
             {menuBar.active && <MenuBar menuBar={{ ...menuBar, categories: allCategories }} setMenuBar={setMenuBar} />}
+            <PromoBar />
             <header className={style.siteHeader}>
                 <div className={style.UserHeadDesk}>
                     <div className={style.subTop}>
@@ -211,7 +213,7 @@ function Header() {
                                 <div className={style.topLeft}>
                                     <h5>
                                         <i className="fa-solid fa-truck-fast"></i>
-                                        <span>Worldwide Delivery</span>
+                                        <span>Pan-India Delivery</span>
                                     </h5>
                                 </div>
                                 <div className={style.topRight}>
@@ -386,7 +388,7 @@ function Header() {
                 <div className={style.subTop}>
                     <div>
                         <i className="fa-solid fa-truck-fast"></i>
-                        <span>Worldwide Delivery</span>
+                        <span>Pan-India Delivery</span>
                     </div>
                     {
                         userLogged.status && (

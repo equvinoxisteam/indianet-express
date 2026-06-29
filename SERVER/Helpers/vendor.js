@@ -648,13 +648,28 @@ export default {
                     count: s.count || 0
                 }))
 
+                const statusCount = (name) => orderStatus.find((s) => s.status === name)?.count || 0
+                const processingStatuses = ['Processing', 'Shipped', 'In Transit', 'Out For Delivery']
+                const ordersProcessing = processingStatuses.reduce((sum, st) => sum + statusCount(st), 0)
+
+                const revenueAgg = await db.get().collection(collections.ORDERS).aggregate([
+                    { $unwind: '$order' },
+                    { $match: { 'order.vendorId': vendorId, 'order.OrderStatus': 'Delivered' } },
+                    { $group: { _id: null, total: { $sum: '$order.price' } } },
+                ]).toArray()
+                const totalRevenue = revenueAgg[0]?.total || 0
+
                 resolve({
                     products: products || 0,
                     rfqTotal: rfqTotal || 0,
                     rfqPending: rfqPending || 0,
                     rfqResponded: rfqQuoted || 0,
                     orderTotal,
-                    orderStatus
+                    orderStatus,
+                    ordersPending: statusCount('Pending'),
+                    ordersProcessing,
+                    ordersDelivered: statusCount('Delivered'),
+                    totalRevenue,
                 })
             } catch (err) {
                 reject(err)

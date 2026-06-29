@@ -4,6 +4,131 @@
     padding-bottom: 3rem;
     overflow-x: hidden;
 
+    // Shop category grid (robocraze-style)
+    .shopSection {
+        width: 100%;
+        background: #fff;
+        padding: 2.5rem 0 3rem;
+        margin-top: 0;
+    }
+
+    .shopSectionInner {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 clamp(0.75rem, 2vw, 2rem);
+    }
+
+    .shopSectionHeader {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .shopTitle {
+        font-size: clamp(1.5rem, 4vw, 2.25rem);
+        font-weight: $font-weight-bold;
+        color: $neutral-900;
+        letter-spacing: 0.08em;
+        margin: 0 0 0.5rem;
+    }
+
+    .shopSubtitle {
+        color: $neutral-500;
+        font-size: clamp(0.85rem, 2.5vw, 1rem);
+        margin: 0;
+        max-width: 640px;
+        margin-inline: auto;
+    }
+
+    .shopGrid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+
+        @media (min-width: 768px) {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+        }
+
+        @media (min-width: 992px) {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+    }
+
+    .shopCard {
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        border: 1px solid $neutral-100;
+        border-radius: $radius-lg;
+        overflow: hidden;
+        transition: all $transit-normal;
+        height: 100%;
+
+        &:hover {
+            border-color: $primary;
+            box-shadow: $shadow-lg;
+            transform: translateY(-4px);
+        }
+    }
+
+    .shopCardImage {
+        aspect-ratio: 4 / 3;
+        background: $neutral-50;
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform $transit-slow;
+        }
+
+        .shopCard:hover & img {
+            transform: scale(1.05);
+        }
+    }
+
+    .shopCardBody {
+        padding: 1rem 1rem 1.15rem;
+        text-align: center;
+    }
+
+    .shopCardName {
+        font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+        font-weight: $font-weight-bold;
+        color: $neutral-800;
+        margin: 0 0 0.35rem;
+    }
+
+    .shopCardPrice {
+        margin: 0;
+        font-size: 0.85rem;
+        color: $primary;
+        font-weight: $font-weight-medium;
+    }
+
+    .shopSectionFooter {
+        text-align: center;
+        margin-top: 2rem;
+    }
+
+    .shopViewAll {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        color: $primary;
+        font-weight: $font-weight-bold;
+        text-decoration: none;
+        font-size: 0.95rem;
+
+        &:hover {
+            color: $primary-dark;
+            text-decoration: underline;
+        }
+    }
+
     // Full width section containers
     .sectionFullWidth {
         width: 100%;

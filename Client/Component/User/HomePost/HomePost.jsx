@@ -11,8 +11,9 @@ import Server, { ServerId, userAxios } from '@/Config/Server';
 import ContentControl from '@/ContentControl/ContentControl';
 import toast from 'react-hot-toast';
 import CategoryPath from '@/Component/Common/CategoryPath';
+import ShopGrid from './ShopGrid';
 
-function HomePost({ layout }) {
+function HomePost({ layout, shopCategories = [] }) {
     const sectionfour = layout?.sectionfour || { title: '', subTitle: '', items: [], items2: [] }
     const sectionone = layout?.sectionone || { title: '', subTitle: '', items: [] }
     const sectiontwo = layout?.sectiontwo || { title: '', subTitle: '', items: [], items2: [] }
@@ -36,6 +37,9 @@ function HomePost({ layout }) {
 
     const validItems = (items) => (items || []).filter((obj) => obj?._id !== undefined)
     const catItems = validItems(sectionone.items)
+    const shopItems = shopCategories.length > 0
+        ? shopCategories
+        : catItems.map((c) => ({ ...c, minPrice: null, productCount: 0 }))
     const sectionTwoItems = validItems(sectiontwo.items)
     const sectionThreeItems = validItems(sectionthree.items)
     const sectionFourItems = validItems(sectionfour.items)
@@ -43,68 +47,11 @@ function HomePost({ layout }) {
 
     return (
         <div className={style.HomePost}>
-            {/* SECTION 1 - Categories - Full Width */}
-            {catItems.length > 0 && (
-            <div className={style.sectionFullWidth}>
-                <div className={style.sectionHeader}>
-                    <h2 className='text-center font-bold UserBlackMain mb-2'>{sectionone.title}</h2>
-                    <p className='text-center UserGrayMain mx-auto' style={{ maxWidth: '600px' }}>{sectionone.subTitle}</p>
-                </div>
-                <div className={style.categorySliderFullWidth}>
-                    <div className={style.catNavPrev} id='cat-nav-prev'>
-                        <i className="fa-solid fa-chevron-left"></i>
-                    </div>
-                    <div className={style.catNavNext} id='cat-nav-next'>
-                        <i className="fa-solid fa-chevron-right"></i>
-                    </div>
-                    <Swiper
-                        autoplay={{
-                            delay: 5000,
-                            disableOnInteraction: false,
-                        }}
-                        modules={[Autoplay, Navigation]}
-                        navigation={{
-                            prevEl: '#cat-nav-prev',
-                            nextEl: '#cat-nav-next',
-                        }}
-                        spaceBetween={15}
-                        breakpoints={{
-                            0: { slidesPerView: 2 },
-                            768: { slidesPerView: 3 },
-                            992: { slidesPerView: 4 },
-                            1205: { slidesPerView: 6 },
-                        }}
-                    >
-                        {
-                            catItems.map((obj, key) => {
-                                if (obj._id !== undefined) {
-                                    return (
-                                        <SwiperSlide key={key}>
-                                            <div className={style.UserCateSlidCard}>
-                                                <div className={style.InnerDiv}>
-                                                    <Link href={`/c/${obj.slug}`} className="LinkTagNonDec">
-                                                        <div className={style.UserCateSlidImgDiv}>
-                                                            <img className={style.UserCateSlidImg}
-                                                                src={`${ServerId}/category/${obj.uni_id1}${obj.uni_id2}/${obj.file.filename}`} alt={obj.name} loading="lazy" />
-                                                        </div>
-                                                        <div>
-                                                            <h5 className='UserBlackMain font-bolder oneLineTxt'>{obj.name}</h5>
-                                                        </div>
-                                                    </Link>
-                                                </div>
-                                            </div>
-                                        </SwiperSlide>
-                                    )
-                                } else {
-                                    return null
-                                }
-
-                            })
-                        }
-                    </Swiper>
-                </div>
-            </div>
-            )}
+            <ShopGrid
+                categories={shopItems}
+                title={sectionone.title || 'SHOP'}
+                subTitle={sectionone.subTitle || 'Browse categories and order online with fast delivery across India'}
+            />
 
             {/* SECTION 2 - Products */}
             {sectionTwoItems.length > 0 && (

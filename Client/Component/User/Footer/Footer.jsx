@@ -55,6 +55,8 @@ function Footer() {
                                 <li><Link href="/company">About {BRAND_NAME}</Link></li>
                                 <li><Link href="/categories">Browse Categories</Link></li>
                                 <li><Link href="/privacy-policy">Privacy Policy</Link></li>
+                                <li><Link href="/terms">Terms &amp; Conditions</Link></li>
+                                <li><Link href="/shipping">Shipping &amp; Delivery</Link></li>
                             </ul>
                         </div>
                     </div>

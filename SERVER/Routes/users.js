@@ -397,6 +397,14 @@ router.get('/getAllCategories', (req, res) => {
     })
 })
 
+router.get('/shopCategories', (req, res) => {
+    product.getShopCategories().then((categories) => {
+        res.status(200).json(categories)
+    }).catch(() => {
+        res.status(500).json('err')
+    })
+})
+
 router.get('/getLayouts', async (req, res) => {
     try {
         const sectionone = await layout.getSectionsCategory('sectionone')
@@ -855,8 +863,9 @@ router.post('/checkPincode', async (req, res) => {
     })
     if (!token) return;
 
+    const pickupPostcode = process.env.SHIPROCKET_PICKUP_POSTCODE || '110001'
     const parameterGenerator = new URLSearchParams({
-        pickup_postcode: 110001,
+        pickup_postcode: pickupPostcode,
         delivery_postcode: req.body.pin,
         weight: 2,
         cod: 1

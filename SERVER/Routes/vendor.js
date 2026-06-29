@@ -912,18 +912,17 @@ router.get('/getOrderSpecific', CheckVendor, async (req, res) => {
 
     if (shiprocketConfigured) {
         token = await tokenShipRocket().catch(() => null);
-        if (!token) {
-            return res.status(500).json('err')
-        }
     }
 
     let order_current = await vendor.getOrderSpecific(req.query).catch(() => {
         res.status(500).json('err')
     })
 
+    if (!order_current) return
+
     let track
 
-    if (order_current && token) {
+    if (order_current && token && order_current.shipment_id) {
         track = await trackProduct(order_current.shipment_id, token).catch(() => {
             console.log('error track')
         })

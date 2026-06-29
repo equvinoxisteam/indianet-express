@@ -8,6 +8,11 @@ function EditOrder({ Order, onUpdated }) {
     const [status, setStatus] = useState(Order.OrderStatus || 'Pending')
     const [saving, setSaving] = useState(false)
 
+    const awb = Order?.track?.tracking_data?.shipment_track?.[0]?.awb_code
+        || Order?.track?.awb
+        || Order?.awb
+    const courier = Order?.track?.tracking_data?.shipment_track?.[0]?.courier_name
+
     const updateStatus = () => {
         if (!Order.userId || !Order.secretOrderId) return
         setSaving(true)
@@ -101,6 +106,38 @@ function EditOrder({ Order, onUpdated }) {
                         <label className="form-label fw-semibold">MRP (₹)</label>
                         <input type="text" className="form-control" value={Order.mrp ?? ''} readOnly disabled />
                     </div>
+
+                    <div className='col-12'><h3 className="settingsProfileCardTitle">Shipping (Shiprocket)</h3></div>
+                    <div className='col-12 col-md-4'>
+                        <label className="form-label fw-semibold">Shiprocket order ID</label>
+                        <input type="text" className="form-control" value={Order.order_id_shiprocket || '—'} readOnly disabled />
+                    </div>
+                    <div className='col-12 col-md-4'>
+                        <label className="form-label fw-semibold">Shipment ID</label>
+                        <input type="text" className="form-control" value={Order.shipment_id || '—'} readOnly disabled />
+                    </div>
+                    <div className='col-12 col-md-4'>
+                        <label className="form-label fw-semibold">AWB / tracking</label>
+                        <input type="text" className="form-control" value={awb || '—'} readOnly disabled />
+                    </div>
+                    {courier && (
+                        <div className='col-12 col-md-6'>
+                            <label className="form-label fw-semibold">Courier</label>
+                            <input type="text" className="form-control" value={courier} readOnly disabled />
+                        </div>
+                    )}
+                    {awb && (
+                        <div className='col-12'>
+                            <a
+                                className="vendorBtnSecondary d-inline-flex align-items-center gap-2"
+                                href={`https://shiprocket.co/tracking/${awb}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <i className="fa-solid fa-truck" /> Track on Shiprocket
+                            </a>
+                        </div>
+                    )}
 
                     <div className='col-12'><h3 className="settingsProfileCardTitle">Ship to</h3></div>
                     <div className='col-12 col-md-6'>

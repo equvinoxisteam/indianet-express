@@ -4,6 +4,7 @@ import HomePost from '@/Component/User/HomePost/HomePost'
 import QuickView from '@/Component/User/QuickView/QuickView'
 import Slider from '@/Component/User/Slider/Slider'
 import Server from '@/Config/Server'
+import { BRAND_NAME, BRAND_TAGLINE } from '@/Config/brand'
 import ContentControl from '@/ContentControl/ContentControl'
 import Head from 'next/head'
 import { Fragment, useContext, useState } from 'react'
@@ -60,19 +61,23 @@ function normalizeHomeLayout(raw) {
 
 export async function getServerSideProps() {
   try {
-    const layout = await Server.get('/users/getLayouts')
+    const [layoutRes, shopRes] = await Promise.all([
+      Server.get('/users/getLayouts'),
+      Server.get('/users/shopCategories').catch(() => ({ data: [] })),
+    ])
     return {
       props: {
-        response: normalizeHomeLayout(layout.data),
+        response: normalizeHomeLayout(layoutRes.data),
+        shopCategories: Array.isArray(shopRes.data) ? shopRes.data : [],
         layoutLoadError: null,
       },
     }
   } catch (err) {
-    // Do not send users to /404 when the API is down or misconfigured — still render the shell.
     console.error('[index] getLayouts failed:', err?.message || err)
     return {
       props: {
         response: normalizeHomeLayout(null),
+        shopCategories: [],
         layoutLoadError:
           process.env.NODE_ENV === 'development'
             ? 'Home layout API failed (is SERVER running and Client/.env.local ServerUrl correct?).'
@@ -82,15 +87,15 @@ export async function getServerSideProps() {
   }
 }
 
-export default function Home({ response, layoutLoadError }) {
+export default function Home({ response, shopCategories, layoutLoadError }) {
   const { QuickVw } = useContext(ContentControl)
 
   const [layout] = useState(response)
   return (
     <Fragment>
       <Head>
-        <title>Indianet — B2B Marketplace</title>
-        <meta name="description" content="Indianet — online shopping marketplace" />
+        <title>{BRAND_NAME} — Shop Online</title>
+        <meta name="description" content={BRAND_TAGLINE} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <main>
@@ -104,7 +109,7 @@ export default function Home({ response, layoutLoadError }) {
         )}
         {QuickVw.active && <QuickView />}
         <Slider layout={layout} />
-        <HomePost layout={layout} />
+        <HomePost layout={layout} shopCategories={shopCategories} />
         <Footer />
       </main>
     </Fragment>

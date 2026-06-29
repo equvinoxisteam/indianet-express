@@ -27,7 +27,6 @@ const vendorNavItems = [
     {
         label: 'Account',
         items: [
-            { href: '/vendor/plans', icon: 'fa-solid fa-gem', label: 'Plans' },
             { href: '/vendor/settings', icon: 'fa-solid fa-gear', label: 'Settings' },
         ]
     },

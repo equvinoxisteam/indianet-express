@@ -4,15 +4,15 @@ export const PLAN_BILLING_PERIODS = ['annual', 'semiannual']
 
 export const VENDOR_PLANS = {
     free: {
-        label: 'Free',
+        label: 'Seller',
         annualPrice: 0,
-        rfqQuotaMonthly: 2,
-        showcaseLimit: 1,
+        rfqQuotaMonthly: 0,
+        showcaseLimit: null,
         adsEnabled: false,
         verifiedBadge: false,
-        showCompanyProfile: false,
+        showCompanyProfile: true,
         supplierRating: null,
-        canChangeShowcaseWhenLocked: false,
+        canChangeShowcaseWhenLocked: true,
     },
     basic: {
         label: 'Basic',
@@ -231,6 +231,6 @@ export function getPlanAccess(vendor) {
         verifiedBadge: active ? config.verifiedBadge : false,
         showCompanyProfile: active ? !!config.showCompanyProfile : false,
         supplierRating: active ? config.supplierRating : null,
-        canLinkStorefront: !!active && planKey && planKey !== 'free',
+        canLinkStorefront: !!active,
     }
 }

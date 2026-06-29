@@ -23,6 +23,62 @@ export default {
             resolve(categories)
         })
     },
+    getShopCategories: () => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const categories = await db.get().collection(collections.CATEGORIES).find().toArray()
+                const result = []
+
+                for (const cat of categories) {
+                    const slugs = new Set([cat.slug])
+                    for (const m of cat.mainSub || []) {
+                        if (m.slug) slugs.add(m.slug)
+                    }
+                    for (const s of cat.sub || []) {
+                        if (s.slug) slugs.add(s.slug)
+                    }
+
+                    const stats = await db.get().collection(collections.PRODUCTS).aggregate([
+                        {
+                            $match: {
+                                publishStatus: 'published',
+                                available: 'true',
+                                allowRfq: { $ne: true },
+                                categorySlug: { $in: [...slugs] },
+                                price: { $gt: 0 },
+                            },
+                        },
+                        {
+                            $group: {
+                                _id: null,
+                                minPrice: { $min: '$price' },
+                                productCount: { $sum: 1 },
+                            },
+                        },
+                    ]).toArray()
+
+                    const minPrice = stats[0]?.minPrice ?? null
+                    const productCount = stats[0]?.productCount ?? 0
+
+                    result.push({
+                        _id: cat._id,
+                        name: cat.name,
+                        slug: cat.slug,
+                        uni_id1: cat.uni_id1,
+                        uni_id2: cat.uni_id2,
+                        file: cat.file,
+                        minPrice,
+                        productCount,
+                    })
+                }
+
+                result.sort((a, b) => (b.productCount || 0) - (a.productCount || 0))
+                resolve(result)
+            } catch (err) {
+                reject(err)
+            }
+        })
+    },
     searchCategory: (search) => {
         return new Promise(async (resolve, reject) => {
             let categories = await db.get().collection(collections.CATEGORIES).find({
