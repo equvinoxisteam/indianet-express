@@ -77,6 +77,9 @@ function CheckVendor(req, res, next) {
         vendor.getVendor(vendorTkn._id).then(async (data) => {
             if (data) {
                 const current = await vendorPlan.ensurePlanCurrent(data).catch(() => data)
+                if (!req.body || typeof req.body !== 'object') {
+                    req.body = {}
+                }
                 req.body.vendorId = current._id.toString()
                 req.query.vendorId = current._id.toString()
                 next()

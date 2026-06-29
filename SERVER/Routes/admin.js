@@ -26,6 +26,9 @@ function CheckAdmin(req, res, next) {
 
         admin.getAdmin(AdminTkn._id).then((data) => {
             if (data) {
+                if (!req.body || typeof req.body !== 'object') {
+                    req.body = {}
+                }
                 req.body.adminId = data._id.toString()
                 req.query.adminId = data._id.toString()
                 next()
@@ -432,17 +435,38 @@ router.delete('/deleteProduct/:id', CheckAdmin, (req, res) => {
     }
 })
 
-router.post('/addCategory', CheckAdmin, uploader.categories.single('image'), (req, res) => {
-    req.body.file = req.file
-    req.body.header = 'false'
-    req.body.slug = slugify(req.body.name)
-    req.body.mainSub = []
-    req.body.sub = []
+router.post('/addCategory', CheckAdmin, (req, res) => {
+    uploader.categories.single('image')(req, res, (uploadErr) => {
+        if (uploadErr) {
+            console.error('[addCategory] upload failed:', uploadErr.message || uploadErr)
+            return res.status(400).json({ error: uploadErr.message || 'Image upload failed. Use JPG or PNG under 5 MB.' })
+        }
 
-    admin.addCategory(req.body).then((done) => {
-        res.status(200).json('done')
-    }).catch((err) => {
-        res.status(500).json('err')
+        const name = String(req.body?.name || '').trim()
+        if (!name) {
+            return res.status(400).json({ error: 'Category name is required.' })
+        }
+        if (!req.file) {
+            return res.status(400).json({ error: 'Category image is required.' })
+        }
+
+        const payload = {
+            uni_id1: req.body.uni_id1,
+            uni_id2: req.body.uni_id2,
+            name,
+            file: req.file,
+            header: 'false',
+            slug: slugify(name),
+            mainSub: [],
+            sub: [],
+        }
+
+        admin.addCategory(payload).then(() => {
+            res.status(200).json('done')
+        }).catch((err) => {
+            console.error('[addCategory] save failed:', err?.message || err)
+            res.status(500).json({ error: 'Could not save category. Check database connection.' })
+        })
     })
 })
 

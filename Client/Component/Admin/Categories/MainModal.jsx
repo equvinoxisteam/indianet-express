@@ -68,7 +68,8 @@ function MainModal({ mainModal, setMainModal, setCategories, logOut }) {
                     })
                 }
             }).catch((err) => {
-                toast.error('Facing An Error')
+                const msg = err.response?.data?.error
+                toast.error(msg || 'Could not add category. Use JPG/PNG under 5 MB.')
             })
         })
 

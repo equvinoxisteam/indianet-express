@@ -17,16 +17,29 @@ const productsStorage = createUploadStorage({
     },
 })
 
+function safeCategoryFilename(originalname) {
+    const base = String(originalname || 'image.jpg').replace(/[^a-zA-Z0-9._-]/g, '_')
+    return `${Date.now()}-${base}`
+}
+
 const categoryStorage = createUploadStorage({
     diskDestination(req) {
-        return `./uploads/category/${req.body.uni_id1}${req.body.uni_id2}`
+        const id1 = req.body?.uni_id1 || 'cat'
+        const id2 = req.body?.uni_id2 || Date.now()
+        return `./uploads/category/${id1}${id2}`
     },
     diskFilename(req, file) {
-        return file.originalname
+        return safeCategoryFilename(file.originalname)
     },
     s3KeyBuilder(req, file) {
-        const folder = `${req.body.uni_id1}${req.body.uni_id2}`
-        return `category/${folder}/${file.originalname}`
+        const id1 = req.body?.uni_id1 || 'cat'
+        const id2 = req.body?.uni_id2 || Date.now()
+        const folder = `${id1}${id2}`
+        const filename = safeCategoryFilename(file.originalname)
+        return {
+            key: `category/${folder}/${filename}`,
+            filename,
+        }
     },
 })
 
@@ -100,7 +113,14 @@ const vendorProfileStorage = createUploadStorage({
 
 export default {
     products: multer({ storage: productsStorage }),
-    categories: multer({ storage: categoryStorage }),
+    categories: multer({
+        storage: categoryStorage,
+        limits: { fileSize: 5 * 1024 * 1024 },
+        fileFilter(req, file, cb) {
+            const ok = /^image\/(jpeg|jpg|png|gif|webp)$/i.test(file.mimetype)
+            cb(ok ? null : new Error('Only JPG, PNG, GIF or WebP images are allowed.'), ok)
+        },
+    }),
     extra: multer({ storage: extraStorage }),
     banner: multer({ storage: bannerStorage }),
     userProfile: multer({
