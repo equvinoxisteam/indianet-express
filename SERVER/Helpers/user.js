@@ -18,6 +18,27 @@ function computeGstAmount(baseAmount) {
     return Math.round(n * GST_RATE * 100) / 100
 }
 
+function resolvePickupPostcode(lineOrItem, vendorPinById = {}) {
+    const direct = lineOrItem?.pickupPinCode
+    if (direct) return String(direct).trim().toUpperCase()
+    const vid = String(lineOrItem?.vendorId || '')
+    return vendorPinById[vid] ? String(vendorPinById[vid]).trim().toUpperCase() : null
+}
+
+function groupByPickupShipment(items, vendorPinById = {}) {
+    const groups = {}
+    for (const line of items) {
+        const vid = String(line.vendorId || '')
+        const pin = resolvePickupPostcode(line, vendorPinById)
+        const key = `${vid}|${pin || 'unknown'}`
+        if (!groups[key]) {
+            groups[key] = { vendorId: vid, pickupPostcode: pin, items: [] }
+        }
+        groups[key].items.push(line)
+    }
+    return Object.values(groups)
+}
+
 export default {
     CheckUser: (details) => {
         return new Promise(async (resolve, reject) => {
@@ -762,6 +783,7 @@ export default {
                             unitPrice: 1,
                             mrpUnit: 1,
                             vendorId: '$product.vendorId',
+                            pickupPinCode: '$product.pickupPinCode',
                             weightKg: '$product.weightKg',
                             lengthCm: '$product.lengthCm',
                             breadthCm: '$product.breadthCm',
@@ -818,15 +840,7 @@ export default {
                 let shippingAmount = 0
 
                 if (delivery_pincode) {
-                    const vendorGroups = {}
-                    for (const line of lines) {
-                        const vid = String(line.vendorId || '')
-                        if (!vid) continue
-                        if (!vendorGroups[vid]) vendorGroups[vid] = []
-                        vendorGroups[vid].push(line)
-                    }
-
-                    const vendorIds = Object.keys(vendorGroups)
+                    const vendorIds = [...new Set(lines.map((l) => String(l.vendorId || '')).filter(Boolean))]
                     const vendorObjectIds = vendorIds
                         .map((id) => {
                             try {
@@ -846,18 +860,19 @@ export default {
                         pinCodeByVendor[String(v._id)] = v.pinCode
                     }
 
-                    for (const vid of vendorIds) {
-                        const vendorPinCode = pinCodeByVendor[vid]
-                        if (!vendorPinCode) continue
+                    const shipmentGroups = groupByPickupShipment(lines, pinCodeByVendor)
+                    for (const group of shipmentGroups) {
+                        const pickupPostcode = group.pickupPostcode
+                        if (!pickupPostcode) continue
 
-                        const items = vendorGroups[vid]
+                        const items = group.items
                         const totalWeightKg = items.reduce((sum, it) => sum + (toFiniteNumber(it.weightKg, 2.5) * toFiniteNumber(it.quantity, 0)), 0)
                         const lengthCm = Math.max(...items.map((it) => toFiniteNumber(it.lengthCm, 10)))
                         const breadthCm = Math.max(...items.map((it) => toFiniteNumber(it.breadthCm, 15)))
                         const heightCm = Math.max(...items.map((it) => toFiniteNumber(it.heightCm, 20)))
 
                         const estimate = await estimateShippingCost({
-                            pickup_postcode: vendorPinCode,
+                            pickup_postcode: pickupPostcode,
                             delivery_postcode: delivery_pincode,
                             cod: payType === 'cod',
                             weight: totalWeightKg,
@@ -947,6 +962,7 @@ export default {
                         variantSize: 1,
                         proName: '$item.name',
                         pickup_location: '$item.pickup_location',
+                        pickupPinCode: '$item.pickupPinCode',
                         // ShipRocket shipment weight/dim (stored on product)
                         weightKg: '$item.weightKg',
                         lengthCm: '$item.lengthCm',
@@ -1016,6 +1032,7 @@ export default {
                         variantSize: 1,
                         proName: 1,
                         pickup_location: 1,
+                        pickupPinCode: 1,
                         weightKg: 1,
                         lengthCm: 1,
                         breadthCm: 1,
@@ -1058,6 +1075,7 @@ export default {
                                 variantSize: "$variantSize",
                                 proName: '$proName',
                                 pickup_location: '$pickup_location',
+                                pickupPinCode: '$pickupPinCode',
                                 weightKg: '$weightKg',
                                 lengthCm: '$lengthCm',
                                 breadthCm: '$breadthCm',
@@ -1134,10 +1152,11 @@ export default {
                         pinCodeByVendor[String(v._id)] = v.pinCode
                     }
 
-                    for (const vid of vendorIds) {
-                        const vendorPinCode = pinCodeByVendor[vid]
-                        const items = vendorGroups[vid] || []
-                        if (!vendorPinCode || items.length === 0) {
+                    const shipmentGroups = groupByPickupShipment(orderItems, pinCodeByVendor)
+                    for (const group of shipmentGroups) {
+                        const pickupPostcode = group.pickupPostcode
+                        const items = group.items || []
+                        if (!pickupPostcode || items.length === 0) {
                             for (const it of items) it.shippingAmount = 0
                             continue
                         }
@@ -1151,7 +1170,7 @@ export default {
                         const heightCm = Math.max(...items.map((it) => toFiniteNumber(it.heightCm, 20)))
 
                         const estimate = await estimateShippingCost({
-                            pickup_postcode: vendorPinCode,
+                            pickup_postcode: pickupPostcode,
                             delivery_postcode: deliveryPin,
                             cod: payType === 'cod',
                             weight: totalWeightKg,
@@ -1322,14 +1341,16 @@ export default {
                         vendorPinCode = null
                     }
 
-                    if (vendorPinCode) {
+                    const pickupPostcode = productDoc?.pickupPinCode || vendorPinCode
+
+                    if (pickupPostcode) {
                         const totalWeightKg = toFiniteNumber(productDoc?.weightKg, 2.5) * toFiniteNumber(quantity, 1)
                         const lengthCm = toFiniteNumber(productDoc?.lengthCm, 10)
                         const breadthCm = toFiniteNumber(productDoc?.breadthCm, 15)
                         const heightCm = toFiniteNumber(productDoc?.heightCm, 20)
 
                         const estimate = await estimateShippingCost({
-                            pickup_postcode: vendorPinCode,
+                            pickup_postcode: pickupPostcode,
                             delivery_postcode: deliveryPin,
                             cod: codPayType === 'cod',
                             weight: totalWeightKg,
@@ -1392,6 +1413,7 @@ export default {
                         user: userId,
                         product: '$_id',
                         pickup_location: '$pickup_location',
+                        pickupPinCode: '$pickupPinCode',
                         // ShipRocket shipment weight/dim (stored on product)
                         weightKg: '$weightKg',
                         lengthCm: '$lengthCm',
@@ -1461,6 +1483,7 @@ export default {
                         user: 1,
                         quantity: 1,
                         pickup_location: 1,
+                        pickupPinCode: 1,
                         weightKg: 1,
                         lengthCm: 1,
                         breadthCm: 1,
@@ -1506,6 +1529,7 @@ export default {
                                 product: '$product',
                                 proName: '$proName',
                                 pickup_location: '$pickup_location',
+                                pickupPinCode: '$pickupPinCode',
                                 weightKg: '$weightKg',
                                 lengthCm: '$lengthCm',
                                 breadthCm: '$breadthCm',
@@ -1564,14 +1588,16 @@ export default {
                         vendorPinCode = null
                     }
 
-                    if (vendorPinCode) {
+                    const pickupPostcode = item.pickupPinCode || vendorPinCode
+
+                    if (pickupPostcode) {
                         const totalWeightKg = toFiniteNumber(item.weightKg, 2.5) * toFiniteNumber(item.quantity, 1)
                         const lengthCm = toFiniteNumber(item.lengthCm, 10)
                         const breadthCm = toFiniteNumber(item.breadthCm, 15)
                         const heightCm = toFiniteNumber(item.heightCm, 20)
 
                         const estimate = await estimateShippingCost({
-                            pickup_postcode: vendorPinCode,
+                            pickup_postcode: pickupPostcode,
                             delivery_postcode: deliveryPin,
                             cod: payType === 'cod',
                             weight: totalWeightKg,

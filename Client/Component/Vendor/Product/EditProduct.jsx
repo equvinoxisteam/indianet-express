@@ -4,6 +4,7 @@ import { vendorAxios } from '../../../Config/Server';
 import ContentControl from '../../../ContentControl/ContentControl';
 import { useRouter } from 'next/router';
 import ObjectId from 'bson-objectid';
+import PickupAddressSelect from './PickupAddressSelect'
 
 const MAX_PRODUCT_IMAGES = 4
 
@@ -72,6 +73,7 @@ function EditProduct({
     formData.append('rfqLeadTime', productDetails.rfqLeadTime || '')
     formData.append('rfqCertificates', JSON.stringify(productDetails.rfqCertificates || []))
     formData.append('isShowcase', productDetails.isShowcase ? 'true' : 'false')
+    formData.append('pickupAddressId', productDetails.pickupAddressId || '')
 
     // ShipRocket shipment dimension/weight inputs
     formData.append('weightKg', productDetails.weightKg ?? 2.5)
@@ -262,6 +264,42 @@ function EditProduct({
               </div>
             )}
           </div>
+
+          {!productDetails.allowRfq && (
+            <div className="col-md-12 editorSection">
+              <h5 className="editorSectionTitle">Pickup &amp; shipping</h5>
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <label className="fw-semibold">Pickup address</label>
+                  <PickupAddressSelect
+                    value={productDetails.pickupAddressId}
+                    onChange={(id) => setProductDetails({ ...productDetails, pickupAddressId: id })}
+                    required={productDetails.publishStatus === 'published'}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="fw-semibold">Package weight (kg)</label>
+                  <input type="number" min="0.1" step="0.1" className="form-control" value={productDetails.weightKg ?? 2.5}
+                    onChange={(e) => setProductDetails({ ...productDetails, weightKg: e.target.value })} />
+                </div>
+                <div className="col-md-4">
+                  <label>Length (cm)</label>
+                  <input type="number" min="1" className="form-control" value={productDetails.lengthCm ?? 10}
+                    onChange={(e) => setProductDetails({ ...productDetails, lengthCm: e.target.value })} />
+                </div>
+                <div className="col-md-4">
+                  <label>Breadth (cm)</label>
+                  <input type="number" min="1" className="form-control" value={productDetails.breadthCm ?? 15}
+                    onChange={(e) => setProductDetails({ ...productDetails, breadthCm: e.target.value })} />
+                </div>
+                <div className="col-md-4">
+                  <label>Height (cm)</label>
+                  <input type="number" min="1" className="form-control" value={productDetails.heightCm ?? 20}
+                    onChange={(e) => setProductDetails({ ...productDetails, heightCm: e.target.value })} />
+                </div>
+              </div>
+            </div>
+          )}
 
           {productDetails.allowRfq && (
             <>

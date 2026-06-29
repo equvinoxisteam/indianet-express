@@ -246,6 +246,9 @@ export default {
                     return: data.return,
                     cancellation: data.cancellation,
                     pickup_location: data.pickup_location,
+                    pickupAddressId: data.pickupAddressId,
+                    pickupLabel: data.pickupLabel,
+                    pickupPinCode: data.pickupPinCode,
                     // ShipRocket shipment dimensions/weight
                     weightKg: data.weightKg,
                     lengthCm: data.lengthCm,

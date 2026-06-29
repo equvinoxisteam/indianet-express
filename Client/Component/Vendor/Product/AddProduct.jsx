@@ -6,6 +6,7 @@ import ContentControl from '../../../ContentControl/ContentControl'
 import { useRouter } from 'next/router';
 import { COMMISSION_PERCENT, FIXED_FEE_PER_LINE, SETTLEMENT_DAYS, computeLinePlatformFee } from '@/Config/platformFees'
 import ObjectId from 'bson-objectid';
+import PickupAddressSelect from './PickupAddressSelect'
 
 const MAX_PRODUCT_IMAGES = 4
 const MAX_GALLERY_IMAGES = MAX_PRODUCT_IMAGES - 1
@@ -51,6 +52,11 @@ function AddProduct() {
       rfqPackaging: {},
       rfqCertificates: [],
       isShowcase: false,
+      pickupAddressId: '',
+      weightKg: 2.5,
+      lengthCm: 10,
+      breadthCm: 15,
+      heightCm: 20,
       uni_id_1: Date.now() + Math.random(),
     }
   )
@@ -167,6 +173,11 @@ function AddProduct() {
       return
     }
 
+    if (finalStatus !== 'draft' && !productDetails.pickupAddressId) {
+      alert('Select a pickup address for this product (or save as draft).')
+      return
+    }
+
     const firstVariant = productDetails.variant[0]
     const listPrice = firstVariant ? Number(firstVariant.price) || 0 : Number(productDetails.price) || 0
     const listMrp = firstVariant ? Number(firstVariant.mrp) || 0 : Number(productDetails.mrp) || 0
@@ -202,6 +213,11 @@ function AddProduct() {
     formData.append('rfqPackaging', JSON.stringify({}))
     formData.append('rfqCertificates', JSON.stringify(productDetails.rfqCertificates || []))
     formData.append('isShowcase', productDetails.isShowcase ? 'true' : 'false')
+    formData.append('pickupAddressId', productDetails.pickupAddressId || '')
+    formData.append('weightKg', productDetails.weightKg ?? 2.5)
+    formData.append('lengthCm', productDetails.lengthCm ?? 10)
+    formData.append('breadthCm', productDetails.breadthCm ?? 15)
+    formData.append('heightCm', productDetails.heightCm ?? 20)
 
     if (thumb) {
       formData.append('images', thumb);
@@ -408,6 +424,43 @@ function AddProduct() {
               </div>
             )}
           </div>
+
+          {!productDetails.allowRfq && (
+            <div className="col-md-12 editorSection">
+              <h5 className="editorSectionTitle">Pickup &amp; shipping</h5>
+              <p className="editorSectionHint small text-muted">Shiprocket uses this address to estimate shipping and create pickup. Manage addresses in Settings.</p>
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <label className="fw-semibold">Pickup address</label>
+                  <PickupAddressSelect
+                    value={productDetails.pickupAddressId}
+                    onChange={(id) => setProductDetails({ ...productDetails, pickupAddressId: id })}
+                    required={submitMode !== 'draft'}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="fw-semibold">Package weight (kg)</label>
+                  <input type="number" min="0.1" step="0.1" className="form-control" value={productDetails.weightKg}
+                    onChange={(e) => setProductDetails({ ...productDetails, weightKg: e.target.value })} />
+                </div>
+                <div className="col-md-4">
+                  <label>Length (cm)</label>
+                  <input type="number" min="1" className="form-control" value={productDetails.lengthCm}
+                    onChange={(e) => setProductDetails({ ...productDetails, lengthCm: e.target.value })} />
+                </div>
+                <div className="col-md-4">
+                  <label>Breadth (cm)</label>
+                  <input type="number" min="1" className="form-control" value={productDetails.breadthCm}
+                    onChange={(e) => setProductDetails({ ...productDetails, breadthCm: e.target.value })} />
+                </div>
+                <div className="col-md-4">
+                  <label>Height (cm)</label>
+                  <input type="number" min="1" className="form-control" value={productDetails.heightCm}
+                    onChange={(e) => setProductDetails({ ...productDetails, heightCm: e.target.value })} />
+                </div>
+              </div>
+            </div>
+          )}
 
           {productDetails.allowRfq && (
             <>

@@ -2,6 +2,7 @@ import { vendorAxios, ServerId } from "@/Config/Server"
 import { useState, useEffect, useRef } from "react"
 import toast from 'react-hot-toast';
 import { useRouter } from "next/router";
+import VendorPickupAddresses from './VendorPickupAddresses'
 
 const MAX_STORE_CERTIFICATES = 5
 
@@ -378,6 +379,13 @@ function SettingsComp({ venderLogged, setVendorLogged }) {
                                 onClick={() => setActiveTab('details')}
                             >
                                 <span>Personal details</span>
+                            </button>
+                            <button
+                                type="button"
+                                className={`settingsNavPill ${activeTab === 'pickup' ? 'active' : ''}`}
+                                onClick={() => setActiveTab('pickup')}
+                            >
+                                <span>Pickup addresses</span>
                             </button>
                             <button
                                 type="button"
@@ -1045,6 +1053,19 @@ function SettingsComp({ venderLogged, setVendorLogged }) {
                                         </div>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Pickup addresses Tab */}
+                    {activeTab === 'pickup' && (
+                        <div aria-label="pickupAddresses">
+                            <div className="vendorPageHeader">
+                                <h1 className="vendorPageTitle">Pickup addresses</h1>
+                                <p className="vendorPageSubtitle">Warehouses or shops where couriers collect your orders. Select one per product when listing.</p>
+                            </div>
+                            <div className="settingsProfileCard p-3 p-md-4">
+                                <VendorPickupAddresses />
                             </div>
                         </div>
                     )}

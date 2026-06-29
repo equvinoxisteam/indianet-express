@@ -18,6 +18,7 @@ import trackProduct, { orderStatusControl } from "../ShipRocket/trackProduct.js"
 import { notifyOrderStatusChanged, getOrderLineForNotify } from "../Helpers/orderNotifications.js";
 import tokenShipRocket from "../ShipRocket/token.js";
 import settlement from "../Helpers/settlement.js";
+import vendorPickup from "../Helpers/vendorPickup.js";
 import XLSX from "xlsx";
 
 var router = express.Router()
@@ -384,7 +385,6 @@ router.get('/getCategories', (req, res) => {
 router.post('/addProduct', CheckVendor, uploader.products.any(), (req, res, next) => {
     req.body.vendorId = req.query.vendorId
     req.body.vendor = true
-    req.body.pickup_location = req.query.vendorId
     const allUploadedFiles = Array.isArray(req.files) ? req.files : []
     const productImages = allUploadedFiles.filter((f) => f.fieldname === 'images')
     const incomingStatus = VALID_PUBLISH_STATUS.has(req.body.publishStatus) ? req.body.publishStatus : 'draft'
@@ -495,6 +495,17 @@ router.post('/addProduct', CheckVendor, uploader.products.any(), (req, res, next
         }
         if (!req.body.isShowcase || incomingStatus !== 'published') {
             req.body.isShowcase = false
+        }
+
+        try {
+            await vendorPickup.applyToProductBody(req.body, req.query.vendorId)
+        } catch (e) {
+            const msg = e.message === 'pickup_address_required'
+                ? 'Select a pickup address for this product (Settings → Pickup addresses).'
+                : (e.message === 'no_pickup_addresses'
+                    ? 'Add a pickup address in Settings before publishing.'
+                    : e.message)
+            return res.status(400).json({ error: msg })
         }
 
         vendor.addProduct(req.body).then(async (done) => {
@@ -725,7 +736,6 @@ router.put('/editProduct/:id', CheckVendor, uploader.products.any(), (req, res) 
             data.currVariantSize = ""
         }
 
-        data.pickup_location = req.query.vendorId
         data.slug = slugify(data.name)
 
         const mrpParsed2 = Number.parseInt(data.mrp, 10)
@@ -851,6 +861,20 @@ router.put('/editProduct/:id', CheckVendor, uploader.products.any(), (req, res) 
             }
             if (!data.isShowcase || data.publishStatus !== 'published') {
                 data.isShowcase = false
+            }
+
+            if (!data.pickupAddressId && existingProduct?.pickupAddressId) {
+                data.pickupAddressId = existingProduct.pickupAddressId
+            }
+            try {
+                await vendorPickup.applyToProductBody(data, req.query.vendorId)
+            } catch (e) {
+                const msg = e.message === 'pickup_address_required'
+                    ? 'Select a pickup address for this product (Settings → Pickup addresses).'
+                    : (e.message === 'no_pickup_addresses'
+                        ? 'Add a pickup address in Settings before publishing.'
+                        : e.message)
+                return res.status(400).json({ error: msg })
             }
 
             vendor.updateProduct(data, req.query.vendorId).then(async (succ) => {
@@ -1072,6 +1096,46 @@ function safeJsonArray(str, fallback = []) {
 }
 
 const MAX_VENDOR_STORE_CERTIFICATES = 5
+
+router.get('/pickupAddresses', CheckVendor, async (req, res) => {
+    try {
+        const list = await vendorPickup.getAddresses(req.query.vendorId)
+        res.json(list)
+    } catch {
+        res.status(500).json({ error: 'err' })
+    }
+})
+
+router.post('/pickupAddresses', CheckVendor, async (req, res) => {
+    try {
+        const addr = await vendorPickup.addAddress(req.query.vendorId, req.body)
+        res.status(201).json(addr)
+    } catch (e) {
+        if (e.message === 'invalid_pickup_address') {
+            return res.status(400).json({ error: 'Fill label, address, city, state and PIN code.' })
+        }
+        res.status(500).json({ error: e.message })
+    }
+})
+
+router.put('/pickupAddresses/:id', CheckVendor, async (req, res) => {
+    try {
+        const addr = await vendorPickup.updateAddress(req.query.vendorId, req.params.id, req.body)
+        res.json(addr)
+    } catch (e) {
+        if (e.message === 'address_not_found') return res.status(404).json({ error: 'Address not found' })
+        res.status(500).json({ error: e.message })
+    }
+})
+
+router.delete('/pickupAddresses/:id', CheckVendor, async (req, res) => {
+    try {
+        const list = await vendorPickup.deleteAddress(req.query.vendorId, req.params.id)
+        res.json(list)
+    } catch (e) {
+        res.status(500).json({ error: e.message })
+    }
+})
 
 router.put('/updateProfile', CheckVendor, uploader.vendorProfile.fields([
     { name: 'images', maxCount: 1 },
